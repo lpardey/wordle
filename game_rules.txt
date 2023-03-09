@@ -1,0 +1,17 @@
+Game Rules
+
+    1. Guess the word in 6 tries.
+    
+    2. Each guess must be a valid 5-letter word. 
+
+    3. The color of the tiles will change to show how close your guess was to the word.
+        3.1. Green tile: letter in word / not the right place.
+        3.2. Yellow tile: letter in word / in the right place.
+        3.3. Grey tile: letter not in word
+
+    4. If the player guess before the 6th trie, he can play a new game. This generates a "streak".
+
+    * Hard Mode
+        Hard mode forces you to play any correct letters on subsequent guesses — so if you have a green S at the start, you'd have to keep playing S at the start from then on. And if you have a yellow R in the word, all subsequent guesses would have to include R somewhere too.
+    
+    ** 

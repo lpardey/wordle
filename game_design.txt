@@ -1,0 +1,94 @@
+API
+
+    -GET:
+
+        - Game state
+            {"game status info": {"game_status": "WAITING_FOR_GUESS", "tries_left": "6"}}
+
+        - Game stats
+            {"game stats": {"games_played": "4", "current_streak": "2", "max_streak": "1"}}
+
+    - POST:
+
+        - Create game*
+            {"game_id": "0"}
+
+        - Join game
+            {"status": "OK", "msg": null}
+            {"status": "ERROR", "msg": "Game status is not AVAILABLE_TO_PLAY"}
+
+        - Guess
+            {"status": "OK", "msg": null}
+            {"status": "ERROR", "msg": "invalid input. <input> is not a valid 5-letter word"}
+            {"status": "ERROR", "msg": "Game status is not WAITING_FOR_GUESS"}
+
+        - End Game
+            {"status": "OK", "msg": null}
+            {"status": "ERROR", "msg": "Game status is not WAITING_FOR_GUESS"}
+
+        * The game is always created depending on the source's IP. A new game is created
+        every 24 hours since the last game. If the player ends a current game, he must wait
+        24 hours to play a new game.
+
+CLIENT
+
+
+CORE
+
+    Functions:
+
+        def generate_word(game_state: WordleGame) -> str
+
+        def guess(game_word: str, guess_word: str) -> bool
+
+        def letter_in_word(game_word: str, guess_word: str) -> bool
+
+        def letter_in_place(game_word: str, guess_word: str) -> bool
+
+        def color_letter(game_word: str, guess_word: str) -> None
+
+
+    Classes:
+
+        WordleGame:
+            def __init__(self, game_state: GameState):
+            self.game_state = game_state
+
+        GameState(BaseModel):
+            player: PlayerState = PlayerState()
+            status: GameStatus = GameStatus.WAITING_FOR_GUESS
+            game_count: int = 0
+
+        PlayerState(BaseModel):
+            tries_left: int = 6
+
+        BasicStatus(str, Enum):
+            OK = "OK"
+            ERROR = "ERROR"
+
+        GameStatus(str, Enum):
+            AVAILABLE_TO_PLAY = "AVAILABLE_TO_PLAY"
+            WAITING_FOR_GUESS = "WAITING_FOR_GUESS"
+            NOT_AVAILABLE_TO_PLAY = "NOT_AVAILABLE_TO_PLAY"
+
+        GameResult(str, Enum):
+            GUESSED = "GUESSED"
+            NOT_GUESSED = "NOT_GUESSED"
+
+        GameConfig(BaseModel):
+            game_mode: str = "Normal"
+            number_of_tries: int = 6
+
+        GameStatusInfo(BaseModel):
+            game_status: GameStatus
+            tries_left: int
+
+        GameStats(BaseModel):
+            games_played: int
+            current_streak: int
+            max_streak: int
+
+
+INTERFACE
+
+    TypeScript - REACT
