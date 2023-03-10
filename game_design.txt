@@ -1,5 +1,7 @@
 API
 
+    Colocar los endpoints con sus metodos. Tambien las requests.
+
     -GET:
 
         - Game state
@@ -9,7 +11,7 @@ API
             {"game stats": {"games_played": "4", "current_streak": "2", "max_streak": "1"}}
 
     - POST:
-
+        
         - Create game*
             {"game_id": "0"}
 
@@ -26,11 +28,65 @@ API
             {"status": "OK", "msg": null}
             {"status": "ERROR", "msg": "Game status is not WAITING_FOR_GUESS"}
 
-        * The game is always created depending on the source's IP. A new game is created
-        every 24 hours since the last game. If the player ends a current game, he must wait
-        24 hours to play a new game.
+        * The game is always created depending on the user's IP. A new game is created
+        every 24 hours since the last game played. If the player ends a current game, he must wait
+        24 hours to play a new game. (Other option) A game is created depending on the user's credentials.
+
 
 CLIENT
+
+    API Requests
+
+        Game:
+
+            - Create a game
+                POST /game
+                
+                Which user is asking to create a game?
+
+                Response:
+                    {game: {game_id: user}}
+
+            - Join the game
+
+            - Take a guess
+                POST /game/{game_id}/guess
+
+                Send the user who is making the request to check who is doing it.
+                Send the guess(str)
+
+                necesitaras mandar de alguna manera que usuario esta haciendo la peticion.
+                la partida ya va a tener un usuario asociado, asi que es solo para comprobar
+                que quien esta mandando la guess esta autorizado a hacerlo
+
+                hay que mandar la guess (string)
+
+                Response:
+                    {
+                        attempts_remaining: 3,
+                        result: <data structure that depicts the guess result>,
+                    }
+
+            - Get the game state
+                GET /game/{game_id}
+
+                Response: 
+                {
+                    guesses: [
+                        {
+                            guess: str,
+                            result: <data structure that depicts the guess result>,
+                        }
+                    ]
+                }
+
+            - End game
+
+        User:
+            - Create user
+            - Log-in
+            - Get player stats
+            - Log-out
 
 
 CORE
@@ -38,21 +94,46 @@ CORE
     Functions:
 
         def generate_word(game_state: WordleGame) -> str
+        """generates and returns a random 5-letter word"""
 
         def guess(game_word: str, guess_word: str) -> bool
+        """compares if the the guess_word is equal to the game_word, adds a try to game_state
+             and returns a bool"""
 
         def letter_in_word(game_word: str, guess_word: str) -> bool
+        """compares if the letter from the guess_word is in game_word and return a bool"""
 
         def letter_in_place(game_word: str, guess_word: str) -> bool
+        """compares if the letter from the guess_word is in the same place 
+            as the letter from game_word and return a bool"""
 
         def color_letter(game_word: str, guess_word: str) -> None
-
+        """returns a list of int depending on the situation:
+            0: letter in word/in place, 1: letter in word/not in place, 2: letter not in word."""
+        
+        def
 
     Classes:
 
+        WordleClient:
+            def __init__(
+                self, 
+                service_url: "http://localhost:8000", 
+                words_service_url: "http://svnweb.freebsd.org/csrg/share/dict/words?view=co&content-type=text/plain"
+                ) -> None:
+                self.service_url = service_url
+                self.words_service_url = words_service_url
+
+            def get_words(self, response: Response) -> None:
+                url = f"{words_service_url}/game"
+                response = request.get(urlopen(word_url))
+                parsed_response = response.decode
+                long_txt = response.read().decode()
+                words = long_txt.splitlines()
+
         WordleGame:
             def __init__(self, game_state: GameState):
-            self.game_state = game_state
+                self.game_state = game_state
 
         GameState(BaseModel):
             player: PlayerState = PlayerState()
