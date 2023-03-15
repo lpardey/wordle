@@ -1,6 +1,6 @@
-from fastapi import FastAPI
-from wordle_schemas.game import GameCreationResponse, GameConfig
-from w_game.game import GameState, PlayerState, User
+from fastapi import FastAPI, HTTPException
+from wordle_schemas.game import GameCreationResponse, GameConfig, GameStatusInfo, GameStatusResponse
+from w_game.game import GameState, Guess, PlayerState, User
 
 
 app = FastAPI()
@@ -34,16 +34,28 @@ class GameStorage:
         self.storage.clear()
 
 
+@app.get("/game/{game_id}")
+def get_game_state(game_id: int) -> GameStatusResponse:
+    game_state = GameStorage().get_game_state(index=game_id)
+
+    if game_state is None:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    response = GameStatusResponse(
+        game_status_info=GameStatusInfo(
+            current_guess=game_state.guess,
+            guess_letters=game_state.guess_letters,
+            game_status=game_state.status,
+        )
+    )
+    return response
+
+
 @app.post("/game")
 def create_game(game_config: GameConfig) -> GameCreationResponse:
     player_state = PlayerState(attempts_left=game_config.number_of_attempts)
-    game_state = GameState(player=player_state, guess="random word")
-    game_state.reset_guess()
+    game_state = GameState(player=player_state)
     user = User(username="guillermo", password="chachief")
     game_storage = GameStorage()
     game_id = game_storage.add_game_state(game_state=game_state)
     return GameCreationResponse(game_id=game_id, username=user.username)
-
-
-
-
