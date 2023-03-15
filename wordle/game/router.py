@@ -1,7 +1,12 @@
 from fastapi import FastAPI, HTTPException
-from wordle_schemas.game import GameCreationResponse, GameConfig, GameStatusInfo, GameStatusResponse
-from w_game.game import GameState, Guess, PlayerState, User
-
+from wordle_schemas.game import (
+    GameCreationResponse,
+    GameConfig,
+    GameStatisticsResponse,
+    GameStatusInfo,
+    GameStatusResponse,
+)
+from w_game.game import GameState, GameStatistics, PlayerState, User
 
 app = FastAPI()
 
@@ -46,6 +51,24 @@ def get_game_state(game_id: int) -> GameStatusResponse:
             current_guess=game_state.guess,
             guess_letters=game_state.guess_letters,
             game_status=game_state.status,
+        )
+    )
+    return response
+
+
+@app.get("/game/{game_id}/stats")
+def get_game_stats(game_id: int) -> GameStatisticsResponse:
+    game_state = GameStorage().get_game_state(index=game_id)
+
+    if game_state is None:
+        raise HTTPException(status_code=404, detail="Not found")
+
+    response = GameStatisticsResponse(
+        game_statistics=GameStatistics(
+            game_results=game_state.statistics.game_results,
+            games_played=game_state.statistics.games_played,
+            winning_percentage=game_state.statistics.winning_percentage,
+            max_streak=game_state.statistics.max_streak,
         )
     )
     return response
