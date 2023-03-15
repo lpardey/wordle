@@ -12,6 +12,7 @@ class User(BaseModel):
 
 class PlayerState(BaseModel):
     attempts_left: int
+    user: User
 
 
 class GameResultEnum(str, Enum):
@@ -51,7 +52,7 @@ class GameStatus(str, Enum):
 
 
 class GameState(BaseModel):
-    player: PlayerState = PlayerState(attempts_left=6)
+    player: PlayerState = PlayerState(attempts_left=6, user=User(username="guillermo", password="12345"))
     game_word: str = "random word"
     guess: Guess = Guess(guess="Guess")
     guess_letters: WordleLetters = WordleLetters(
