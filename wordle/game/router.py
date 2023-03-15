@@ -1,12 +1,13 @@
 from fastapi import FastAPI, HTTPException
 from wordle_schemas.game import (
+    BasicStatus,
     GameCreationResponse,
     GameConfig,
     GameStatisticsResponse,
     GameStatusInfo,
     GameStatusResponse,
 )
-from w_game.game import GameState, GameStatistics, PlayerState, User
+from w_game.game import GameState, GameStatistics, Guess, PlayerState, User
 
 app = FastAPI()
 
@@ -39,13 +40,18 @@ class GameStorage:
         self.storage.clear()
 
 
-@app.get("/game/{game_id}")
-def get_game_state(game_id: int) -> GameStatusResponse:
+def get_game_state_by_id(game_id: int) -> GameState:
     game_state = GameStorage().get_game_state(index=game_id)
 
     if game_state is None:
         raise HTTPException(status_code=404, detail="Not found")
 
+    return game_state
+
+
+@app.get("/game/{game_id}")
+def get_game_state(game_id: int) -> GameStatusResponse:
+    game_state = get_game_state_by_id(game_id=game_id)
     response = GameStatusResponse(
         game_status_info=GameStatusInfo(
             current_guess=game_state.guess,
@@ -58,11 +64,7 @@ def get_game_state(game_id: int) -> GameStatusResponse:
 
 @app.get("/game/{game_id}/stats")
 def get_game_stats(game_id: int) -> GameStatisticsResponse:
-    game_state = GameStorage().get_game_state(index=game_id)
-
-    if game_state is None:
-        raise HTTPException(status_code=404, detail="Not found")
-
+    game_state = get_game_state_by_id(game_id=game_id)
     response = GameStatisticsResponse(
         game_statistics=GameStatistics(
             game_results=game_state.statistics.game_results,
@@ -76,9 +78,31 @@ def get_game_stats(game_id: int) -> GameStatisticsResponse:
 
 @app.post("/game")
 def create_game(game_config: GameConfig) -> GameCreationResponse:
-    player_state = PlayerState(attempts_left=game_config.number_of_attempts)
-    game_state = GameState(player=player_state)
     user = User(username="guillermo", password="chachief")
+    player_state = PlayerState(attempts_left=game_config.number_of_attempts, user=user)
     game_storage = GameStorage()
+    game_state = GameState(player=player_state)
     game_id = game_storage.add_game_state(game_state=game_state)
     return GameCreationResponse(game_id=game_id, username=user.username)
+
+
+@app.post("/game/{game_id}/guess")
+def take_a_guess(game_id: int, user: User, guess_request: TakeAGuessRequest) -> TakeAGuessResponse:
+    game_state = get_game_state_by_id(game_id=game_id)
+    wordle = WordleGame(game_state)
+    status = BasicStatus.OK
+    message = None
+
+    if user.username != game_state.player.user.username:
+        raise HTTPException(status_code=403, detail="Forbidden")
+
+    try:
+        # TODO: insert wordle game function
+
+    except WordleException as e:
+        status = BasicStatus.ERROR
+        message = str(e)
+
+    response = TakeAGuessResponse(status=status, message=message)
+
+    return response
