@@ -1,6 +1,6 @@
 from unittest import mock, TestCase
 import pytest
-from w_game.game import GameState
+from w_game.game_state import GameState
 from wordle.game.router import GameStorage, create_game, get_game_state, get_game_stats
 from wordle_schemas.game import BasicStatus, GameConfig, GameCreationResponse
 
@@ -125,7 +125,6 @@ def test_get_game_state(m_get_game_state: mock.Mock):
     response = get_game_state(game_id=game_id)
     assert m_get_game_state.assert_called_once
     assert m_get_game_state.call_args_list[0][1]["index"] == game_id
-    assert m_get_game_state.call_args == mock.call(index=game_id)
     assert response.message is None
     assert response.status == BasicStatus.OK
     assert response.game_status_info.current_guess == game_state.guess

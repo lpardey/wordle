@@ -7,7 +7,7 @@ from wordle_schemas.game import (
     GameStatusInfo,
     GameStatusResponse,
 )
-from w_game.game import GameState, GameStatistics, Guess, PlayerState, User
+from w_game.game_state import GameState, GameStatistics, PlayerState, User
 
 app = FastAPI()
 
