@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
-from w_game.game import GameStatus, Guess, WordleLetters
+from w_game.game import GameStatistics, GameStatus, Guess, WordleLetters
 
 
 class BasicStatus(str, Enum):
@@ -31,3 +31,7 @@ class GameStatusInfo(BaseModel):
 
 class GameStatusResponse(BasicResponse):
     game_status_info: GameStatusInfo
+
+
+class GameStatisticsResponse(BaseModel):
+    game_statistics: GameStatistics
