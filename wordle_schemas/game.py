@@ -1,18 +1,33 @@
 from enum import Enum
 from pydantic import BaseModel
+from w_game.game import GameStatus, Guess, WordleLetters
+
+
+class BasicStatus(str, Enum):
+    OK = "OK"
+    ERROR = "ERROR"
+
+
+class BasicResponse(BaseModel):
+    status: BasicStatus = BasicStatus.OK
+    message: str | None = None
+
 
 class GameCreationResponse(BaseModel):
     game_id: int
     username: str
 
 
-class GameStatus(str, Enum):
-    AVAILABLE_TO_PLAY = "AVAILABLE_TO_PLAY"
-    WAITING_FOR_GUESS = "WAITING_FOR_GUESS"
-    NOT_AVAILABLE_TO_PLAY = "NOT_AVAILABLE_TO_PLAY"
-
-
 class GameConfig(BaseModel):
     number_of_attempts: int = 6
     game_mode: str = "Normal"
 
+
+class GameStatusInfo(BaseModel):
+    current_guess: Guess
+    guess_letters: WordleLetters
+    game_status: GameStatus
+
+
+class GameStatusResponse(BasicResponse):
+    game_status_info: GameStatusInfo
