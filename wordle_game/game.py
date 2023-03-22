@@ -1,5 +1,4 @@
 from wordle_game.game_state import (
-    LETTERS_AVAILABLE,
     GameResult,
     GameState,
     GameStatus,
@@ -63,8 +62,11 @@ class WordleGame:
         return GuessResult.NOT_GUESSED
 
     def is_victory(self) -> bool:
+        if self.game_state.guesses == []:
+            return False
+
         word = self.game_state.game_word
-        guess = self.game_state.guesses[-1] or ""
+        guess = self.game_state.guesses[-1]
         return word == guess
 
     def is_defeat(self) -> bool:
