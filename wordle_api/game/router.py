@@ -10,7 +10,7 @@ from wordle_schemas.game import (
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
-from wordle_game.game_state import GameState, PlayerState, User
+from wordle_game.game_state import GameState, User
 
 app = FastAPI()
 
@@ -21,21 +21,24 @@ def get_game_state(game_id: int) -> GameStatusResponse:
     response = GameStatusResponse(
         game_status_info=GameStatusInfo(
             game_word=game_state.game_word,
-            current_guess=game_state.guesses[-1],
+            guesses=game_state.guesses,
             game_status=game_state.status,
             difficulty=game_state.difficulty,
         )
-    )
+    )   
     return response
 
 
-# TODO: Fix this function
 @app.post("/game")
 def create_game(game_config: GameConfig) -> GameCreationResponse:
-    user = User(username="guillermo", password="chachief")
-    player_state = PlayerState(attempts_left=game_config.number_of_attempts, user=user)
+    user = User()
     game_storage = GameStorage()
-    game_state = GameState(user_id=0, game_word="PIZZA")
+    game_state = GameState(
+        user_id=0,
+        game_word="PIZZA",
+        number_of_attempts=game_config.number_of_attempts,
+        difficulty=game_config.game_difficulty,
+    )
     game_id = game_storage.add_game_state(game_state=game_state)
     return GameCreationResponse(game_id=game_id, username=user.username)
 
