@@ -6,7 +6,7 @@ ALL_GAMES: dict[int:GameState] = {}
 
 
 class GameStorage:
-    def __init__(self, storage: dict[int:GameState] = ALL_GAMES) -> None:
+    def __init__(self, storage: dict[int, GameState] = ALL_GAMES) -> None:
         self.storage = storage
 
     def get_game_state(self, index: int) -> GameState | None:
