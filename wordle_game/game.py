@@ -26,7 +26,7 @@ class WordleGame:
         guess_result = self.update_game_state()
         return guess_result
 
-    # Auxiliary functions for guess
+    # Auxiliary functions for guess ----------------------------------------------------------------------------------
 
     @staticmethod
     def validate_guess(guess: str) -> None:
