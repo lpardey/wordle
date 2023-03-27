@@ -7,7 +7,6 @@ from wordle_game.game_state import (
 )
 
 
-
 FIVE_LETTER_WORDS = {"PIZZA", "SHEEP"}
 
 
@@ -23,8 +22,7 @@ class WordleGame:
     def guess(self, guess: str) -> GuessResult:
         self.validate_guess(guess=guess)
         self.validate_game_status()
-        # If we reach this point, both the guess and the status are valid
-        self.add_guess(guess=guess)
+        self.add_guess(guess=guess)  # If we reach this point, both the guess and the status are valid
         guess_result = self.update_game_state()
         return guess_result
 
