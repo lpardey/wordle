@@ -138,12 +138,26 @@ def test_is_defeat(m_guesses_left: mock.Mock, basic_wordle_game: WordleGame, gue
 
 
 @pytest.mark.parametrize(
-    "is_victory_result, is_defeat_result, expected_result",
+    "is_victory_result, is_defeat_result, expected_status, expected_game_result, expected_result",
     [
-        pytest.param(True, False, GuessResult.GUESSED, id="Is victory"),
-        pytest.param(False, True, GuessResult.NOT_GUESSED, id="Is defeat"),
-        pytest.param(False, False, GuessResult.NOT_GUESSED, id="Neither victoy nor defeat"),
-        pytest.param(True, True, GuessResult.GUESSED, id="Is victory but is_defeat returns 'True'"),
+        pytest.param(True, False, GameStatus.FINISHED, GameResult.VICTORY, GuessResult.GUESSED, id="Is victory"),
+        pytest.param(False, True, GameStatus.FINISHED, GameResult.DEFEAT, GuessResult.NOT_GUESSED, id="Is defeat"),
+        pytest.param(
+            False,
+            False,
+            GameStatus.WAITING_FOR_GUESS,
+            GameResult.DEFEAT,
+            GuessResult.NOT_GUESSED,
+            id="Neither victoy nor defeat",
+        ),
+        pytest.param(
+            True,
+            True,
+            GameStatus.FINISHED,
+            GameResult.VICTORY,
+            GuessResult.GUESSED,
+            id="Is victory but is_defeat returns 'True'",
+        ),
     ],
 )
 @mock.patch.object(WordleGame, "is_victory")
@@ -154,23 +168,19 @@ def test_update_game_state(
     basic_wordle_game: WordleGame,
     is_victory_result: bool,
     is_defeat_result: bool,
+    expected_status: GameStatus,
+    expected_game_result: GameResult,
     expected_result: GuessResult,
 ):
     m_is_victory.return_value = is_victory_result
     m_is_defeat.return_value = is_defeat_result
     result = basic_wordle_game.update_game_state()
 
-    if m_is_victory.return_value:
-        assert basic_wordle_game.game_state.status == GameStatus.FINISHED
-        assert basic_wordle_game.game_state.result == GameResult.VICTORY
-        assert m_is_victory.called
-
-    elif m_is_defeat.return_value:
-        assert basic_wordle_game.game_state.status == GameStatus.FINISHED
-        assert basic_wordle_game.game_state.result == GameResult.DEFEAT
-        assert m_is_defeat.called
-
+    assert basic_wordle_game.game_state.status == expected_status
+    assert basic_wordle_game.game_state.result == expected_game_result
     assert result == expected_result
+    assert m_is_victory.called
+    assert not m_is_victory.return_value == m_is_defeat.called
 
 
 @pytest.mark.parametrize(
