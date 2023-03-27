@@ -24,7 +24,7 @@ class GameCreationResponse(BaseModel):
 
 class GameConfig(BaseModel):
     number_of_attempts: int = 6
-    game_mode: str = "Normal"
+    game_difficulty: GameDifficulty = GameDifficulty.NORMAL
 
 
 class GameStatusInfo(BaseModel):
