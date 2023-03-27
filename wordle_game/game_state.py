@@ -5,19 +5,20 @@ from string import ascii_uppercase
 LETTERS_AVAILABLE = sorted(list(set(ascii_uppercase)))
 
 
+class UserStatus(str, Enum):
+    AVAILABLE_TO_PLAY = "AVAILABLE TO PLAY"
+    NOT_AVAILABLE_TO_PLAY = "NOT AVAILABLE TO PLAY"
+
+
 class User(BaseModel):
     username: str = "Guillermo"
     password: str = "12345"
 
+    @property
+    def user_status(self) -> UserStatus:
+        return UserStatus.AVAILABLE_TO_PLAY
+
     # property of user -> STatus Available to play or nor available to play
-
-
-class PlayerState(BaseModel):
-    user: User = User()
-    player_guess: str = ""
-    attempts_left: int = 6
-    current_streak: int = 0
-    max_streak: int = 0
 
 
 class GameResult(str, Enum):
@@ -50,13 +51,14 @@ class GameState(BaseModel):
     user_id: int
     game_word: str
     guesses: list[str] = []
+    number_of_attempts: int = 6
     status: GameStatus = GameStatus.WAITING_FOR_GUESS
     result: GameResult = GameResult.DEFEAT
     difficulty: GameDifficulty = GameDifficulty.NORMAL
 
     @property
     def guesses_left(self) -> int:
-        return 6 - len(self.guesses)
+        return self.number_of_attempts - len(self.guesses)
 
 
 # pa despues porque guille dijo : (
