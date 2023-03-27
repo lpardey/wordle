@@ -51,7 +51,7 @@ def test_validate_guess_success(basic_wordle_game: WordleGame):
     "status, expected_result",
     [pytest.param(GameStatus.FINISHED, "Game is over!", id="Invalid status. Game status is 'FINISHED'.")],
 )
-def test_validate_status_failure(expected_result: str, status: GameStatus):
+def test_validate_status_failure(status: GameStatus, expected_result: str):
     game_state = GameState(user_id=0, game_word="PIZZA", status=status)
     wordle = WordleGame(game_state=game_state)
     with pytest.raises(WordleException) as exc_info:
@@ -180,7 +180,7 @@ def test_update_game_state(
     assert basic_wordle_game.game_state.result == expected_game_result
     assert result == expected_result
     assert m_is_victory.called
-    assert not m_is_victory.return_value == m_is_defeat.called
+    assert not is_victory_result == m_is_defeat.called
 
 
 @pytest.mark.parametrize(
