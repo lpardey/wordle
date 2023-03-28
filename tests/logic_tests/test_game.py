@@ -184,10 +184,20 @@ def test_update_game_state(
 
 
 @pytest.mark.parametrize(
-    "validate_guess_result, validate_game_status_result, add_guess_result, update_game_state_result, expected_result",
+    "guess, validate_guess_result, validate_game_status_result, add_guess_result, update_game_state_result, expected_result",
     [
-        pytest.param(None, None, None, GuessResult.GUESSED, GuessResult.GUESSED),
-        pytest.param(None, None, None, GuessResult.NOT_GUESSED, GuessResult.NOT_GUESSED),
+        pytest.param(
+            "PIZZA", None, None, None, GuessResult.GUESSED, GuessResult.GUESSED, id="Valid guess, player guesses"
+        ),
+        pytest.param(
+            "SHEEP",
+            None,
+            None,
+            None,
+            GuessResult.NOT_GUESSED,
+            GuessResult.NOT_GUESSED,
+            id="Valid guess, player doesn't guess",
+        ),
     ],
 )
 @mock.patch.object(WordleGame, "validate_guess")
@@ -200,6 +210,7 @@ def test_guess(
     m_validate_game_status: mock.Mock,
     m_validate_guess: mock.Mock,
     basic_wordle_game: WordleGame,
+    guess: str,
     validate_guess_result: NoneType,
     validate_game_status_result: NoneType,
     add_guess_result: NoneType,
@@ -210,7 +221,7 @@ def test_guess(
     m_validate_game_status.return_value = validate_game_status_result
     m_add_guess.return_value = add_guess_result
     m_update_game_state.return_value = update_game_state_result
-    result = basic_wordle_game.guess(guess="PIZZA")
+    result = basic_wordle_game.guess(guess=guess)
     assert m_validate_guess.called
     assert m_validate_game_status.called
     assert m_add_guess.called
