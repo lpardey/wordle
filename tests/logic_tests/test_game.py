@@ -1,4 +1,3 @@
-from types import NoneType
 import pytest
 from unittest import mock
 from wordle_game.game_state import GameResult, GameState, GameStatus, GuessResult
@@ -172,46 +171,72 @@ def test_update_game_state(
 
 
 @pytest.mark.parametrize(
-    "guess, validate_guess_result, validate_game_status_result, add_guess_result, update_game_state_result, expected_result",
+    "guess, update_game_state_result, expected_result",
     [
-        pytest.param(
-            "PIZZA", None, None, None, GuessResult.GUESSED, GuessResult.GUESSED, id="Valid guess, player guesses"
-        ),
-        pytest.param(
-            "SHEEP",
-            None,
-            None,
-            None,
-            GuessResult.NOT_GUESSED,
-            GuessResult.NOT_GUESSED,
-            id="Valid guess, player doesn't guess",
-        ),
+        pytest.param("PIZZA", GuessResult.GUESSED, GuessResult.GUESSED, id="Player guesses"),
+        pytest.param("SHEEP", GuessResult.NOT_GUESSED, GuessResult.NOT_GUESSED, id="Player doesn't guess"),
     ],
 )
-@mock.patch.object(WordleGame, "validate_guess")
-@mock.patch.object(WordleGame, "validate_game_status")
-@mock.patch.object(WordleGame, "add_guess")
+@mock.patch.object(WordleGame, "validate_guess", return_value=None)
+@mock.patch.object(WordleGame, "validate_game_status", return_value=None)
+@mock.patch.object(WordleGame, "add_guess", return_value=None)
 @mock.patch.object(WordleGame, "update_game_state")
-def test_guess(
+def test_guess_success(
     m_update_game_state: mock.Mock,
     m_add_guess: mock.Mock,
     m_validate_game_status: mock.Mock,
     m_validate_guess: mock.Mock,
-    basic_wordle_game: WordleGame,
     guess: str,
-    validate_guess_result: NoneType,
-    validate_game_status_result: NoneType,
-    add_guess_result: NoneType,
     update_game_state_result: GuessResult,
     expected_result: GuessResult,
+    basic_wordle_game: WordleGame,
 ):
-    m_validate_guess.return_value = validate_guess_result
-    m_validate_game_status.return_value = validate_game_status_result
-    m_add_guess.return_value = add_guess_result
     m_update_game_state.return_value = update_game_state_result
     result = basic_wordle_game.guess(guess=guess)
-    assert m_validate_guess.called
-    assert m_validate_game_status.called
-    assert m_add_guess.called
-    assert m_update_game_state.called
+    assert m_validate_guess.call_count == 1
+    assert m_validate_game_status.call_count == 1
+    assert m_add_guess.call_count == 1
+    assert m_update_game_state.call_count == 1
     assert result == expected_result
+
+
+@pytest.mark.parametrize(
+    "guess, game_status, validate_guess_side_effect, validate_game_status_side_effect",
+    [
+        pytest.param(
+            "7SHEP",
+            GameStatus.WAITING_FOR_GUESS,
+            WordleException(),
+            None,
+            id="At least one of the characters in guess is not alphabetic",
+        ),
+        pytest.param(
+            "SHEEPY", GameStatus.WAITING_FOR_GUESS, WordleException(), None, id="Guess doesn't have 5 letters"
+        ),
+        pytest.param("NOWOR", GameStatus.WAITING_FOR_GUESS, WordleException(), None, id="Guess is not a word"),
+        pytest.param("SHEEP", GameStatus.FINISHED, None, WordleException(), id="Game status is not waiting for guess"),
+    ],
+)
+@mock.patch.object(WordleGame, "validate_guess")
+@mock.patch.object(WordleGame, "validate_game_status")  # Agregar mock de add_guess y update_game_state?
+def test_guess_failure(
+    m_validate_game_status: mock.Mock,
+    m_validate_guess: mock.Mock,
+    guess: str,
+    game_status: GameStatus,
+    validate_guess_side_effect: WordleException | None,
+    validate_game_status_side_effect: WordleException | None,
+    basic_wordle_game: WordleGame,
+):
+    basic_wordle_game.game_state.status = game_status
+    m_validate_guess.side_effect = validate_guess_side_effect
+    m_validate_game_status.side_effect = validate_game_status_side_effect
+    first_side_effect = validate_guess_side_effect or validate_game_status_side_effect
+    expected_message = str(first_side_effect)
+
+    with pytest.raises(WordleException) as exc_info:
+        basic_wordle_game.guess(guess=guess)
+
+    assert str(exc_info.value) == expected_message
+    assert m_validate_guess.call_count == 1
+    assert not validate_guess_side_effect == m_validate_game_status.called
