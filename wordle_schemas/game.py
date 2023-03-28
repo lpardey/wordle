@@ -19,7 +19,6 @@ class BasicResponse(BaseModel):
 
 class GameCreationResponse(BaseModel):
     game_id: int
-    username: str
 
 
 class GameConfig(BaseModel):
