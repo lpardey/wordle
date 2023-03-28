@@ -5,22 +5,6 @@ from string import ascii_uppercase
 LETTERS_AVAILABLE = sorted(list(set(ascii_uppercase)))
 
 
-class UserStatus(str, Enum):
-    AVAILABLE_TO_PLAY = "AVAILABLE TO PLAY"
-    NOT_AVAILABLE_TO_PLAY = "NOT AVAILABLE TO PLAY"
-
-
-class User(BaseModel):
-    username: str = "Guillermo"
-    password: str = "12345"
-
-    @property
-    def user_status(self) -> UserStatus:
-        return UserStatus.AVAILABLE_TO_PLAY
-
-    # property of user -> STatus Available to play or nor available to play
-
-
 class GameResult(str, Enum):
     VICTORY = "VICTORY"
     DEFEAT = "DEFEAT"

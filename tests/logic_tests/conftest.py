@@ -1,11 +1,6 @@
 import pytest
 from wordle_game.game import WordleGame
-from wordle_game.game_state import GameState, User
-
-
-@pytest.fixture()
-def user() -> User:
-    return User(username="user", password="12345")
+from wordle_game.game_state import GameState
 
 
 @pytest.fixture()

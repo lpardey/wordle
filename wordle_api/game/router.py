@@ -10,7 +10,8 @@ from wordle_schemas.game import (
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
-from wordle_game.game_state import GameState, User
+from wordle_game.game_state import GameState
+from wordle_game.user import User
 
 app = FastAPI()
 
@@ -25,13 +26,12 @@ def get_game_state(game_id: int) -> GameStatusResponse:
             game_status=game_state.status,
             difficulty=game_state.difficulty,
         )
-    )   
+    )
     return response
 
 
 @app.post("/game")
 def create_game(game_config: GameConfig) -> GameCreationResponse:
-    user = User()
     game_storage = GameStorage()
     game_state = GameState(
         user_id=0,
@@ -40,7 +40,7 @@ def create_game(game_config: GameConfig) -> GameCreationResponse:
         difficulty=game_config.game_difficulty,
     )
     game_id = game_storage.add_game_state(game_state=game_state)
-    return GameCreationResponse(game_id=game_id, username=user.username)
+    return GameCreationResponse(game_id=game_id)
 
 
 @app.post("/game/{game_id}/guess")
@@ -49,10 +49,9 @@ def take_a_guess(game_id: int, user: User, guess_request: TakeAGuessRequest) -> 
     wordle = WordleGame(game_state)
     status = BasicStatus.OK
     message = None
-
     guess_result = None
 
-    if user.username != game_state.player.user.username:
+    if user.user_id != game_state.user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
 
     try:
