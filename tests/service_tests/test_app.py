@@ -1,31 +1,30 @@
-from unittest import mock, TestCase
+from unittest import mock
 from fastapi import HTTPException
 import pytest
 from wordle_api.game.router import create_game, get_game_state
-from wordle_game.game_state import GameState, GameStatus, User
+from wordle_game.game_state import GameState, GameStatus
 from wordle_game.game_storage import GameStorage
 from wordle_schemas.game import BasicStatus, GameConfig, GameCreationResponse, GameStatusInfo, GameStatusResponse
+from tests.logic_tests.conftest import basic_game_state, basic_wordle_game
 
 
-class TestCreateGame(TestCase):
-    @mock.patch.object(GameStorage, "add_game_state", return_value=0)
-    def test_create_game(self, m_add_game_state: mock.Mock):
-        game_config = GameConfig()
-        user = User()
-        game_id = m_add_game_state.return_value
-        result = create_game(game_config=game_config)
-        expected_result = GameCreationResponse(game_id=game_id, username=user.username)
-        self.assertEqual(result, expected_result)
-        m_add_game_state.assert_called()
+@mock.patch.object(GameStorage, "add_game_state", return_value=0)
+def test_create_game(m_add_game_state: mock.Mock):
+    game_config = GameConfig()
+    game_id = m_add_game_state.return_value
+    result = create_game(game_config=game_config)
+    expected_result = GameCreationResponse(game_id=game_id)
+    assert result == expected_result
+    assert m_add_game_state.call_count == 1
 
-    @mock.patch.object(GameStorage, "storage_size", return_value=0)
-    def test_add_game_state(self, m_storage_size: mock.Mock):
-        game_storage = GameStorage()
-        game_state = GameState(user_id=0, game_word="PIZZA")
-        result = game_storage.add_game_state(game_state=game_state)
-        expected_result = m_storage_size.return_value
-        self.assertEqual(result, expected_result)
-        m_storage_size.assert_called()
+
+@mock.patch.object(GameStorage, "storage_size", return_value=0)
+def test_add_game_state(m_storage_size: mock.Mock, basic_game_state: GameState):
+    game_storage = GameStorage()
+    result = game_storage.add_game_state(game_state=basic_game_state)
+    expected_result = m_storage_size.return_value
+    assert result == expected_result
+    assert m_storage_size.call_count == 1
 
 
 @pytest.mark.parametrize(
