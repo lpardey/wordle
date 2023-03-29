@@ -23,6 +23,7 @@ def get_game_state(game_id: int) -> GameStatusResponse:
             game_word=game_state.game_word,
             guesses=game_state.guesses,
             game_status=game_state.status,
+            attempts_left=game_state.guesses_left,
             difficulty=game_state.difficulty,
         )
     )
@@ -46,16 +47,22 @@ def create_game(game_config: GameConfig) -> GameCreationResponse:
 def take_a_guess(game_id: int, guess_request: TakeAGuessRequest) -> TakeAGuessResponse:
     game_state = get_game_state_by_id(game_id=game_id)
     wordle = WordleGame(game_state)
+    guess = guess_request.guess.upper()
+    game_word = wordle.game_state.game_word
     status = BasicStatus.OK
     message = None
-    guess_result = GuessResult.NOT_GUESSED
+    guess_result = None
+    guess_letters_status = None
 
     try:
-        guess_result = wordle.guess(guess=guess_request.guess.upper())
+        guess_result = wordle.guess(guess=guess)
+        guess_letters_status = wordle.compare(guess=guess, word=game_word)
 
     except WordleException as e:
         status = BasicStatus.ERROR
         message = str(e)
 
-    response = TakeAGuessResponse(status=status, message=message, guess_result=guess_result)
+    response = TakeAGuessResponse(
+        status=status, message=message, guess_result=guess_result, guess_letters_status=guess_letters_status
+    )
     return response
