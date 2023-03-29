@@ -7,7 +7,7 @@ from wordle_game.game_state import (
 )
 
 
-FIVE_LETTER_WORDS = {"PIZZA", "SHEEP"}
+FIVE_LETTER_WORDS = {"PIZZA", "SHEEP", "JAZZY", "CHOKE", "FUSED", "BOOBS", "JUMBO"}
 
 
 class WordleException(Exception):
