@@ -1,7 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel
 from wordle_game.game import GameStatus
-from wordle_game.game_state import GameDifficulty, GuessResult
+from wordle_game.game_state import GameDifficulty, GuessResult, LetterStatus
 
 # schema = transferir informacion --- esto va en la API
 # modelo = almacenar informacion --- esto va en la base de datos
@@ -29,6 +29,7 @@ class GameConfig(BaseModel):
 class GameStatusInfo(BaseModel):
     game_word: str
     guesses: list[str]
+    attempts_left: int
     game_status: GameStatus
     difficulty: GameDifficulty
 
@@ -42,4 +43,5 @@ class TakeAGuessRequest(BaseModel):
 
 
 class TakeAGuessResponse(BasicResponse):
-    guess_result: GuessResult
+    guess_result: GuessResult | None
+    guess_letters_status: list[LetterStatus] | None
