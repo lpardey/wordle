@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from wordle_game.game import WordleException, WordleGame
 from wordle_game.game_storage import GameStorage, get_game_state_by_id
 from wordle_schemas.game import (
@@ -10,8 +10,7 @@ from wordle_schemas.game import (
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
-from wordle_game.game_state import GameState
-from wordle_game.user import User
+from wordle_game.game_state import GameState, GuessResult
 
 app = FastAPI()
 
@@ -44,23 +43,19 @@ def create_game(game_config: GameConfig) -> GameCreationResponse:
 
 
 @app.post("/game/{game_id}/guess")
-def take_a_guess(game_id: int, user: User, guess_request: TakeAGuessRequest) -> TakeAGuessResponse:
+def take_a_guess(game_id: int, guess_request: TakeAGuessRequest) -> TakeAGuessResponse:
     game_state = get_game_state_by_id(game_id=game_id)
     wordle = WordleGame(game_state)
     status = BasicStatus.OK
     message = None
-    guess_result = None
-
-    if user.user_id != game_state.user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
+    guess_result = GuessResult.NOT_GUESSED
 
     try:
-        guess_result = wordle.guess()
+        guess_result = wordle.guess(guess=guess_request.guess.upper())
 
     except WordleException as e:
         status = BasicStatus.ERROR
         message = str(e)
 
     response = TakeAGuessResponse(status=status, message=message, guess_result=guess_result)
-
     return response
