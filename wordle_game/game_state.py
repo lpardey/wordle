@@ -36,7 +36,6 @@ class GameState(BaseModel):
     game_word: str
     guesses: list[str] = []
     number_of_attempts: int = 6
-    status: GameStatus = GameStatus.WAITING_FOR_GUESS
     result: GameResult = GameResult.DEFEAT
     difficulty: GameDifficulty = GameDifficulty.NORMAL
 
@@ -44,6 +43,11 @@ class GameState(BaseModel):
     def guesses_left(self) -> int:
         return self.number_of_attempts - len(self.guesses)
 
+    @property
+    def status(self) -> GameStatus:
+        if self.guesses_left > 0 and self.result != GameResult.VICTORY:
+            return GameStatus.WAITING_FOR_GUESS
+        return GameStatus.FINISHED
 
 # pa despues porque guille dijo : (
 # class GameResult(BaseModel):
