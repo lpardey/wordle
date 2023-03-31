@@ -26,9 +26,13 @@ class GameConfig(BaseModel):
     game_difficulty: GameDifficulty = GameDifficulty.NORMAL
 
 
+class Guess(BaseModel):
+    word: str
+    letters_status: list[LetterStatus]
+
+
 class GameStatusInfo(BaseModel):
-    game_word: str
-    guesses: list[str]
+    guesses: list[Guess]
     attempts_left: int
     game_status: GameStatus
     difficulty: GameDifficulty
