@@ -1,7 +1,7 @@
 from unittest import mock
 from fastapi import HTTPException
 import pytest
-from wordle_api.game.router import create_game, get_game_state, take_a_guess
+from wordle_api.game.router import create_game, get_game_status, take_a_guess
 from wordle_game.game import WordleGame
 from wordle_game.game_state import GameState, GameStatus, GuessResult, LetterStatus
 from wordle_game.game_storage import GameStorage
@@ -72,7 +72,7 @@ def test_add_game_state(m_storage_size: mock.Mock, basic_game_state: GameState):
     ],
 )
 @mock.patch("wordle_game.game_storage.get_game_state_by_id")
-def test_get_game_state_success(
+def test_get_game_status_success(
     m_get_game_state_by_id: mock.Mock,
     game_id: int,
     expected_response: GameStatusResponse,
@@ -81,14 +81,14 @@ def test_get_game_state_success(
     m_get_game_state_by_id.return_value = basic_game_state
     game_storage = GameStorage()
     game_storage.storage.update({game_id: m_get_game_state_by_id.return_value})
-    response = get_game_state(game_id=game_id)
+    response = get_game_status(game_id=game_id)
     assert response == expected_response
     game_storage.storage.clear()
 
-
-def test_get_game_state_failure():
+# TODO: finisht test
+def test_get_game_status_failure():
     with pytest.raises(HTTPException) as exc_info:
-        get_game_state(game_id=7)
+        get_game_status(game_id=7)
     assert str(exc_info.value) == ""
 
 

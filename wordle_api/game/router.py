@@ -17,7 +17,7 @@ app = FastAPI()
 
 
 @app.get("/game/{game_id}")
-def get_game_state(game_id: int) -> GameStatusResponse:
+def get_game_status(game_id: int) -> GameStatusResponse:
     game_state = get_game_state_by_id(game_id=game_id)
     wordle = WordleGame(game_state=game_state)
     guesses = [
