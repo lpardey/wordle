@@ -7,10 +7,11 @@ from wordle_schemas.game import (
     GameConfig,
     GameStatusInfo,
     GameStatusResponse,
+    Guess,
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
-from wordle_game.game_state import GameState, GuessResult
+from wordle_game.game_state import GameState
 
 app = FastAPI()
 
@@ -18,10 +19,14 @@ app = FastAPI()
 @app.get("/game/{game_id}")
 def get_game_state(game_id: int) -> GameStatusResponse:
     game_state = get_game_state_by_id(game_id=game_id)
+    wordle = WordleGame(game_state=game_state)
+    guesses = [
+        Guess(word=guess, letters_status=wordle.compare(guess, game_state.game_word)) for guess in game_state.guesses
+    ]
     response = GameStatusResponse(
         game_status_info=GameStatusInfo(
             game_word=game_state.game_word,
-            guesses=game_state.guesses,
+            guesses=guesses,
             game_status=game_state.status,
             attempts_left=game_state.guesses_left,
             difficulty=game_state.difficulty,
