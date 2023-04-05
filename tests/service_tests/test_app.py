@@ -13,6 +13,7 @@ from wordle_schemas.game import (
     GameStatusResponse,
     TakeAGuessRequest,
 )
+from tests.logic_tests.conftest import basic_game_state, basic_wordle_game, basic_game_storage
 
 
 @mock.patch.object(GameStorage, "add_game_state", return_value=0)
