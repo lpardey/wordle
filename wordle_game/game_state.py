@@ -1,8 +1,5 @@
 from enum import Enum
 from pydantic import BaseModel
-from string import ascii_uppercase
-
-LETTERS_AVAILABLE = sorted(list(set(ascii_uppercase)))
 
 
 class GameResult(str, Enum):
@@ -48,6 +45,7 @@ class GameState(BaseModel):
         if self.guesses_left > 0 and self.result != GameResult.VICTORY:
             return GameStatus.WAITING_FOR_GUESS
         return GameStatus.FINISHED
+
 
 # pa despues porque guille dijo : (
 # class GameResult(BaseModel):

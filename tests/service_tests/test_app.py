@@ -1,7 +1,7 @@
 from unittest import mock
 from fastapi import HTTPException
 import pytest
-from wordle_api.game.router import create_game, get_game_state, take_a_guess
+from wordle_api.game.router import create_game, get_game_status, take_a_guess
 from wordle_game.game import WordleGame
 from wordle_game.game_state import GameState, GameStatus, GuessResult, LetterStatus
 from wordle_game.game_storage import GameStorage
@@ -13,7 +13,6 @@ from wordle_schemas.game import (
     GameStatusResponse,
     TakeAGuessRequest,
 )
-from tests.logic_tests.conftest import basic_game_state, basic_wordle_game, basic_game_storage
 
 
 @mock.patch.object(GameStorage, "add_game_state", return_value=0)
@@ -35,7 +34,7 @@ def test_add_game_state(m_storage_size: mock.Mock, basic_game_state: GameState):
     assert m_storage_size.call_count == 1
 
 
-# Revisar desde aca
+# TODO: por revisar
 @pytest.mark.parametrize(
     "game_id, expected_response",
     [
@@ -72,7 +71,7 @@ def test_add_game_state(m_storage_size: mock.Mock, basic_game_state: GameState):
     ],
 )
 @mock.patch("wordle_game.game_storage.get_game_state_by_id")
-def test_get_game_state_success(
+def test_get_game_status_success(
     m_get_game_state_by_id: mock.Mock,
     game_id: int,
     expected_response: GameStatusResponse,
@@ -81,17 +80,20 @@ def test_get_game_state_success(
     m_get_game_state_by_id.return_value = basic_game_state
     game_storage = GameStorage()
     game_storage.storage.update({game_id: m_get_game_state_by_id.return_value})
-    response = get_game_state(game_id=game_id)
+    response = get_game_status(game_id=game_id)
     assert response == expected_response
     game_storage.storage.clear()
 
 
-def test_get_game_state_failure():
+# TODO: por revisar
+# TODO: finisht test (dunno how to)
+def test_get_game_status_failure():
     with pytest.raises(HTTPException) as exc_info:
-        get_game_state(game_id=7)
+        get_game_status(game_id=7)
     assert str(exc_info.value) == ""
 
 
+# TODO: por revisar
 @pytest.mark.parametrize(
     "guess_request, guess_result, guess_letters_status_result, expected_response",
     [
@@ -141,41 +143,11 @@ def test_take_a_guess(
     game_storage = GameStorage()
     game_storage.storage.update({0: m_get_game_state_by_id.return_value})
     m_compare.return_value = guess_letters_status_result
+
     response = take_a_guess(game_id=0, guess_request=guess_request)
+
     assert response.status == expected_response
     assert response.guess_result == m_guess.return_value
     assert response.guess_letters_status == m_compare.return_value
+
     game_storage.storage.clear()
-
-
-# @pytest.mark.parametrize(
-#     "guess_request, guess_result, expected_response",
-#     [
-#         pytest.param(
-#             TakeAGuessRequest(guess="SHEEP"),
-#             GuessResult.NOT_GUESSED,
-#             BasicStatus.OK,
-#             id="Response status OK, not guessed",
-#         ),
-#         pytest.param(
-#             TakeAGuessRequest(guess="PIZZA"),
-#             GuessResult.GUESSED,
-#             BasicStatus.OK,
-#             id="Response status OK, guessed",
-#         ),
-#     ],
-# )
-# @mock.patch.object(WordleGame, "guess")
-# @mock.patch("wordle_game.game_storage.get_game_state_by_id", return_value=GameState(user_id=0, game_word="PIZZA"))
-# def test_take_a_guess2(
-#     m_get_game_state_by_id: mock.Mock,
-#     m_guess: mock.Mock,
-#     guess_request: TakeAGuessRequest,
-#     guess_result: GuessResult,
-#     expected_response: BasicStatus,
-# ):
-#     m_guess.return_value = guess_result
-#     game_id = 0
-#     response = take_a_guess(game_id=game_id, guess_request=guess_request)
-#     assert response.status == expected_response
-#     assert response.guess_result == m_guess.return_value
