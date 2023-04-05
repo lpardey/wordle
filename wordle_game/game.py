@@ -7,7 +7,7 @@ from wordle_game.game_state import (
 )
 import time
 
-FIVE_LETTER_WORDS = {"PIZZA", "SHEEP", "JAZZY", "CHOKE", "FUSED", "BOOBS", "JUMBO", "PLAZA","PIANO"}
+FIVE_LETTER_WORDS = {"PIZZA", "SHEEP", "JAZZY", "CHOKE", "FUSED", "BOOBS", "JUMBO", "PLAZA", "PIANO"}
 
 
 class WordleException(Exception):
@@ -26,6 +26,7 @@ class WordleGame:
         guess_result = self.update_game_state()
         return guess_result
 
+    # TODO: finish and check if it's going to be used
     def new_game_countdown(self, time_in_seconds: int) -> None:
         while time_in_seconds:
             # minutes, seconds = divmod(time_in_seconds, 60)
@@ -41,6 +42,7 @@ class WordleGame:
 
         self.reset_game()
 
+    # TODO: finish and check if it's going to be used
     def reset_game(self) -> None:
         # Generar una nueva partida
         #   Generar una nueva palabra

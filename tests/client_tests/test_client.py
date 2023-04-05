@@ -1,12 +1,12 @@
-import json
 from typing import Type
 import pytest
 from requests import Response
 from wordle_client.client import GenericResponse, WordleClient, WordleClientException
-from wordle_schemas.game import BasicResponse, BasicStatus
+from wordle_schemas.game import BasicResponse, BasicStatus, GameConfig, GameCreationResponse
 from unittest import mock
 
 
+# TODO: por revisar
 @pytest.mark.parametrize(
     "status_code, reason, check_http_status_side_effect",
     [
@@ -41,6 +41,7 @@ def test_check_http_status_client_or_server_error(
     assert str(exc_info.value) == expected_message
 
 
+# TODO: por revisar
 @pytest.mark.parametrize(
     "status_code, reason, expected_result",
     [
@@ -73,6 +74,7 @@ def test_check_http_status_not_client_or_server_error(
     assert result == expected_result
 
 
+# TODO: por revisar
 def test_check_response_status_failure(basic_wordle_client: WordleClient):
     response = BasicResponse(status=BasicStatus.ERROR, message="Take a guess")
     expected_message = str(WordleClientException(f"Error processing request: {response.message}"))
@@ -83,6 +85,7 @@ def test_check_response_status_failure(basic_wordle_client: WordleClient):
     assert (str(exc_info.value)) == expected_message
 
 
+# TODO: por revisar
 def test_check_response_status_success(basic_wordle_client: WordleClient):
     response = BasicResponse(status=BasicStatus.OK, message="Take a guess")
     expected_result = None
@@ -92,6 +95,7 @@ def test_check_response_status_success(basic_wordle_client: WordleClient):
     assert result == expected_result
 
 
+# TODO: por revisar
 @pytest.mark.parametrize(
     "status_code, reason, check_http_status_side_effect, response_type, check_response_status_side_effect",
     [
@@ -133,14 +137,33 @@ def test_process_response_failure(
     assert str(exc_info.value) == expected_message
 
 
-# @mock.patch.object(WordleClient, "check_http_status")
-# @mock.patch.object(WordleClient, "check_response_status")
-# def test_process_response_success():
-#     response = Response
+# TODO: por revisar
+@mock.patch.object(WordleClient, "check_http_status", return_value=None)
+@mock.patch.object(WordleClient, "check_response_status", return_value=None)
+def test_process_response_success(
+    m_check_response_status: mock.Mock, m_check_http_status: mock.Mock, basic_wordle_client: WordleClient
+):
+    response = Response
+
+    result = basic_wordle_client.process_response(response=response, response_type=BasicResponse)
+    expected_result = BasicResponse(status=BasicStatus.OK, message=None)
+
+    assert m_check_response_status.call_count == 1
+    assert m_check_response_status.call_args_list[0][1]["response"] == response
+
+    assert m_check_http_status.call_count == 1
+
+    assert result == expected_result
 
 
-# def process_response(self, response: Response, response_type: Type[GenericResponse]) -> GenericResponse:
-#     self.check_http_status(response)
-#     parsed_response = response_type(**json.loads(response.text))
-#     self.check_response_status(parsed_response)
-#     return parsed_response
+# TODO: por revisar
+@mock.patch.object(WordleClient, "process_response", return_value=GameCreationResponse(game_id=0))
+def test_create_game(m_process_response: mock.Mock, basic_wordle_client: WordleClient):
+    game_config = GameConfig()
+    response = Response
+    response.url = basic_wordle_client.service_url
+
+    result = basic_wordle_client.create_game(game_config=game_config)
+    expected_result = m_process_response.return_value
+
+    assert result == expected_result
