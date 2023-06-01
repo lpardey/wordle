@@ -21,4 +21,5 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    token: str
+    access_token: str
+    token_type: str

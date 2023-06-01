@@ -2,4 +2,5 @@ pydantic
 fastapi[all]
 requests
 python-multipart
+python-jose[cryptography]
 passlib[bcrypt]

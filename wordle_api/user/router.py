@@ -12,6 +12,7 @@ from .store import (
     UserStore,
 )
 from .schemas import SignUpRequest, LoginRequest, LoginResponse, UpdateRequest
+from wordle_api.auth.utils import get_password_hash
 
 router = APIRouter(prefix="/account", tags=["Account"])
 
@@ -74,7 +75,8 @@ def get_user(username: str) -> User:
 def create_user(request: SignUpRequest) -> None:
     try:
         user_store: UserStore = UserStoreDict.get_instance()
-        user_store.create_user(request.username, request.password)
+        hashed_password = get_password_hash(request.password)
+        user_store.create_user(request.username, hashed_password)
 
     except StoreExceptionAlreadyInUse as e:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=str(e))

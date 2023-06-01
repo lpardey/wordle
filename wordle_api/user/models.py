@@ -8,6 +8,7 @@ class User(BaseModel):
     # en verdad nunca querremos guardar passwords en texto plano
     # pero de momento en este ejemplo vamos a ir tirando con eso
     password: str
+    disabled: bool = False
 
 
 class UserSession(BaseModel):

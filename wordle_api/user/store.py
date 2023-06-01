@@ -1,7 +1,7 @@
 from __future__ import annotations
 from datetime import datetime, timedelta
 
-from wordle_api.user.models import User
+
 from .models import User, UserSession
 from abc import abstractmethod
 from uuid import uuid4
