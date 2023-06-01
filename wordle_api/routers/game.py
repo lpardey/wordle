@@ -1,6 +1,8 @@
-from fastapi import FastAPI
+from fastapi import HTTPException, APIRouter, Request
+from wordle_client.game_word import AllWords, get_game_word
 from wordle_game.game import WordleException, WordleGame
-from wordle_game.game_storage import GameStorage, get_game_state_by_id
+from wordle_game.game_storage import GameStorage
+from wordle_game.player_storage import get_game_state_by_id, get_player_by_id
 from wordle_schemas.game import (
     BasicStatus,
     GameCreationResponse,
@@ -13,11 +15,14 @@ from wordle_schemas.game import (
 )
 from wordle_game.game_state import GameState
 
-app = FastAPI()
+from wordle_api.user.auth import authorized_endpoint
+
+router = APIRouter(prefix="/game", tags=["Game"])
 
 
-@app.get("/game/{game_id}")
-def get_game_status(game_id: int) -> GameStatusResponse:
+@router.get("/{game_id}")
+@authorized_endpoint
+def get_game_status(request: Request, game_id: int) -> GameStatusResponse:
     game_state = get_game_state_by_id(game_id=game_id)
     wordle = WordleGame(game_state=game_state)
     guesses = [
@@ -27,30 +32,34 @@ def get_game_status(game_id: int) -> GameStatusResponse:
         game_status_info=GameStatusInfo(
             game_word=game_state.game_word,
             guesses=guesses,
-            game_status=game_state.status,
             attempts_left=game_state.guesses_left,
+            game_status=game_state.status,
             difficulty=game_state.difficulty,
         )
     )
     return response
 
 
-@app.post("/game")
-def create_game(game_config: GameConfig) -> GameCreationResponse:
-    game_storage = GameStorage()
+@router.post("/{player_id}")
+def create_game(player_id: int, game_config: GameConfig) -> GameCreationResponse:
+    player = get_player_by_id(player_id=player_id)
     game_state = GameState(
-        user_id=0,
-        game_word="PIZZA",
+        player_id=player_id,
+        game_word=get_game_word(words_list=AllWords.words),
         number_of_attempts=game_config.number_of_attempts,
         difficulty=game_config.game_difficulty,
     )
-    game_id = game_storage.add_game_state(game_state=game_state)
+    game_id = GameStorage().add_game_state(game_state=game_state)
     return GameCreationResponse(game_id=game_id)
 
 
-@app.post("/game/{game_id}/guess")
-def take_a_guess(game_id: int, guess_request: TakeAGuessRequest) -> TakeAGuessResponse:
+@router.post("/{player_id}/{game_id}/guess")
+def take_a_guess(player_id: int, game_id: int, guess_request: TakeAGuessRequest) -> TakeAGuessResponse:
     game_state = get_game_state_by_id(game_id=game_id)
+
+    if game_state.player_id != player_id:
+        raise HTTPException(status_code=403, detail="FORBIDDEN")
+
     wordle = WordleGame(game_state)
     guess = guess_request.guess.upper()
     game_word = wordle.game_state.game_word

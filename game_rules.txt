@@ -12,9 +12,9 @@ Game Rules
     4. If the player guess before the 6th try, he can play a new game. This generates a "streak".
 
     * Games
-        The game is always created depending on the user's IP. A new game is created
+        The game is always created depending on the player's IP. A new game is created
         every 24 hours since the last game played. If the player ends a current game, he must wait
-        24 hours to play a new game. (Other option) A game is created depending on the user's credentials.
+        24 hours to play a new game. (Other option) A game is created depending on the player's credentials.
 
     ** Hard Mode
         Hard mode forces you to play any correct letters on subsequent guesses. 

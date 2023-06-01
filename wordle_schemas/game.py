@@ -32,6 +32,7 @@ class Guess(BaseModel):
 
 
 class GameStatusInfo(BaseModel):
+    game_word: str
     guesses: list[Guess]
     attempts_left: int
     game_status: GameStatus

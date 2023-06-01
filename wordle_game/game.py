@@ -1,3 +1,4 @@
+import time
 from wordle_game.game_state import (
     GameResult,
     GameState,
@@ -5,9 +6,10 @@ from wordle_game.game_state import (
     GuessResult,
     LetterStatus,
 )
-import time
+from wordle_client.game_word import AllWords
 
-FIVE_LETTER_WORDS = {"PIZZA", "SHEEP", "JAZZY", "CHOKE", "FUSED", "BOOBS", "JUMBO", "PLAZA", "PIANO"}
+
+# FIVE_LETTER_WORDS: list[str] = get_words_list()
 
 
 class WordleException(Exception):
@@ -17,7 +19,6 @@ class WordleException(Exception):
 class WordleGame:
     def __init__(self, game_state: GameState) -> None:
         self.game_state = game_state
-        self.game_state.game_word = game_state.game_word.upper()
 
     def guess(self, guess: str) -> GuessResult:
         self.validate_game_status()
@@ -64,7 +65,7 @@ class WordleGame:
         if len(guess) != 5:
             raise WordleException(f"Invalid guess. '{guess}' does not have 5 letters.")
 
-        if guess not in FIVE_LETTER_WORDS:
+        if guess not in AllWords.words:
             raise WordleException(f"Invalid guess. '{guess}' is not a word.")
 
     def validate_game_status(self) -> None:

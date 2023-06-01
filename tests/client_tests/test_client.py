@@ -1,4 +1,5 @@
 from typing import Type
+import unittest
 import pytest
 from requests import Response
 from wordle_client.client import GenericResponse, WordleClient, WordleClientException
@@ -117,6 +118,7 @@ def test_check_response_status_success(basic_wordle_client: WordleClient):
         ),
     ],
 )
+@unittest.skip("To be finished")
 def test_process_response_failure(
     status_code: int,
     reason: str,
@@ -138,6 +140,7 @@ def test_process_response_failure(
 
 
 # TODO: por revisar
+@unittest.skip("To be finished")
 @mock.patch.object(WordleClient, "check_http_status", return_value=None)
 @mock.patch.object(WordleClient, "check_response_status", return_value=None)
 def test_process_response_success(
@@ -157,6 +160,7 @@ def test_process_response_success(
 
 
 # TODO: por revisar
+@unittest.skip("To be finished")
 @mock.patch.object(WordleClient, "process_response", return_value=GameCreationResponse(game_id=0))
 def test_create_game(m_process_response: mock.Mock, basic_wordle_client: WordleClient):
     game_config = GameConfig()

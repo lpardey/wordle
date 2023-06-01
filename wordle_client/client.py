@@ -63,7 +63,7 @@ class WordleClient:
 
     def health_check(self) -> BasicResponse:
         url = f"{self.service_url}/healthcheck"
-        response = requests.get(url)
+        response = requests.get(url=url)
         parsed_response = self.process_response(response, BasicResponse)
         return parsed_response
 

@@ -29,7 +29,7 @@ class LetterStatus(int, Enum):
 
 
 class GameState(BaseModel):
-    user_id: int
+    player_id: int
     game_word: str
     guesses: list[str] = []
     number_of_attempts: int = 6
@@ -45,18 +45,3 @@ class GameState(BaseModel):
         if self.guesses_left > 0 and self.result != GameResult.VICTORY:
             return GameStatus.WAITING_FOR_GUESS
         return GameStatus.FINISHED
-
-
-# pa despues porque guille dijo : (
-# class GameResult(BaseModel):
-#     game_word: str
-#     guesses: list[str]
-#     guess_result: GuessResult
-#     current_streak: int
-
-
-# class GameStatistics(BaseModel):
-#     game_results: list[GameResult]
-#     games_played: int
-#     winning_percentage: int
-#     max_streak: int
