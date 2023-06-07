@@ -1,10 +1,6 @@
 from passlib.context import CryptContext
-
-
 from wordle_api.user.models import User
-
 from wordle_api.user.store import UserStore, UserStoreDict
-
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

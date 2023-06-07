@@ -1,12 +1,9 @@
+from jose import jwt, JWTError
 from datetime import datetime, timedelta
 from typing import Annotated
-
 from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jose import JWTError, jwt
-
 from pydantic import BaseModel
-
 from wordle_api.user.models import User
 from wordle_api.user.schemas import LoginResponse
 from wordle_api.user.store import StoreExceptionNotFound, UserStore, UserStoreDict
@@ -18,6 +15,11 @@ from .utils import authenticate_user
 SECRET_KEY = "c2be1062540cd526c982764243e6ab5247fb4d638d4a4f088ce904d4fda63b45"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
+CREDENTIALS_EXCEPTION = HTTPException(
+    status_code=status.HTTP_401_UNAUTHORIZED,
+    detail="Could not validate credentials",
+    headers={"WWW-Authenticate": "Bearer"},
+)
 
 
 class Token(BaseModel):
@@ -31,7 +33,7 @@ class TokenData(BaseModel):
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-router = APIRouter(prefix="/auth", tags=["qwer"])
+router = APIRouter(prefix="/auth", tags=["Authentication"])
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
@@ -50,48 +52,41 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
     user_store: UserStore = UserStoreDict.get_instance()
 
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str | None = payload.get("sub")
+
         if username is None:
-            raise credentials_exception
+            raise CREDENTIALS_EXCEPTION
+
         user = user_store.get_user(username=username)
     except JWTError:
-        raise credentials_exception
+        raise CREDENTIALS_EXCEPTION
+
     except StoreExceptionNotFound:
-        raise credentials_exception
+        raise CREDENTIALS_EXCEPTION
 
     return user
 
 
 async def get_current_active_user(current_user: Annotated[User, Depends(get_current_user)]) -> User:
     if current_user.disabled:
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Inactive user")
     return current_user
 
 
 @router.post("/token", response_model=LoginResponse)
-async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> LoginResponse:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Incorrect username or password",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]) -> LoginResponse:
     try:
         user = authenticate_user(form_data.username, form_data.password)
     except Exception:
-        raise credentials_exception
+        raise CREDENTIALS_EXCEPTION
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
-    response = LoginResponse(access_token=access_token, token_type="bearer")
+    response = LoginResponse(access_token=access_token, token_type="Bearer")
     return response
 
 
