@@ -1,10 +1,12 @@
 {
-	"name": "new project",
-	"build": {
-		"dockerfile": "../Dockerfile",
-		"context": "..",
-		"target": "development"
-	},
+	"name": "Wordle",
+	"dockerComposeFile": [
+		"../docker-compose.yml",
+		"docker-compose.yml"
+	],
+
+	"service": "wordle_back",
+	"workspaceFolder": "/app",
 	"customizations": {
 		"vscode": {
 			"settings": {
@@ -39,7 +41,8 @@
 				"ms-python.python",
 				"littlefoxteam.vscode-python-test-adapter",
 				"ms-vsliveshare.vsliveshare",
-				"mhutchie.git-graph"
+				"mhutchie.git-graph",
+				"ms-toolsai.jupyter"
 			]
 		}
 	}
