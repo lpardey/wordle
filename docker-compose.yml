@@ -1,0 +1,16 @@
+version: "3.4"
+services:      
+  wordle_back:
+    build:
+      dockerfile: Dockerfile
+      context: .
+      target: development
+    command: ["uvicorn", "--host", "0.0.0.0", "wordle_api.main:app"]
+    ports:
+      - "8000:8000"  # esto es solo para el mundo exterior, y que puedas ver los docs
+    volumes:
+      - .:/app
+    working_dir: /app
+networks:
+  default:
+    name: wordle
