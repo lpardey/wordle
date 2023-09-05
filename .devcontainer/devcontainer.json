@@ -1,8 +1,8 @@
 {
 	"name": "Wordle",
 	"dockerComposeFile": [
-		"../docker-compose.yml",
-		"docker-compose.yml"
+		"../compose.yaml",
+		"compose.yaml"
 	],
 
 	"service": "wordle_back",
