@@ -12,7 +12,7 @@ from .store import (
     UserStore,
 )
 from .schemas import SignUpRequest, LoginRequest, LoginResponse, UpdateRequest
-from wordle_api.auth.utils import get_password_hash
+from wordle_api.auth.utils import authenticate_user, get_password_hash
 
 router = APIRouter(prefix="/account", tags=["Account"])
 
@@ -87,19 +87,13 @@ def create_user(request: SignUpRequest) -> None:
 
 @router.post("/login")
 def login(request: LoginRequest) -> LoginResponse:
-    # si el usuario esta en el user store y la contraseña es correcta
-    # crear un token y devolverlo
-    # si no, dar un error http 404, not found
     try:
-        user_store: UserStore = UserStoreDict.get_instance()
-        user = user_store.get_user(request.username)
-        if user.password == request.password:
-            session_store: SessionStore = SessionStoreDict.get_instance()
-            session_id = session_store.create_session(user.id)
-            session = session_store.get_session_by_id(session_id)
-            response = LoginResponse(token=session.token)
-            return response
-        raise LOGIN_FAILED
+        user = authenticate_user(request.username, request.password)
+        session_store: SessionStore = SessionStoreDict.get_instance()
+        session_id = session_store.create_session(user.id)
+        session = session_store.get_session_by_id(session_id)
+        response = LoginResponse(access_token=session.token, token_type="bcrypt")  # token_type???
+        return response
 
     except StoreExceptionNotFound:
         raise LOGIN_FAILED
