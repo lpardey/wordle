@@ -20,5 +20,5 @@ def authorized_endpoint(func):
         if user_session.expiration_date < datetime.now():
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
         return func(request, *args, **kwargs)
-    
+
     return wrapper
