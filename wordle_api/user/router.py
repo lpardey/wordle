@@ -28,7 +28,7 @@ def is_user_available(username: str) -> None:
 
 
 @router.put("/update/{user_id}")
-@authorized_endpoint
+#@authorized_endpoint
 def update_user(request: Request, user_id: int, update_request: UpdateRequest) -> None:
     try:
         user_store: UserStore = UserStoreDict.get_instance()
@@ -43,7 +43,7 @@ def update_user(request: Request, user_id: int, update_request: UpdateRequest) -
 
 
 @router.delete("/delete/{user_id}")
-@authorized_endpoint
+#@authorized_endpoint
 def delete_user(request: Request, user_id: int) -> None:
     try:
         user_store: UserStore = UserStoreDict.get_instance()

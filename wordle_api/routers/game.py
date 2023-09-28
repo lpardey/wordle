@@ -21,7 +21,7 @@ router = APIRouter(prefix="/game", tags=["Game"])
 
 
 @router.get("/{game_id}")
-@authorized_endpoint
+# @authorized_endpoint
 def get_game_status(request: Request, game_id: int) -> GameStatusResponse:
     game_state = get_game_state_by_id(game_id=game_id)
     wordle = WordleGame(game_state=game_state)
@@ -42,7 +42,6 @@ def get_game_status(request: Request, game_id: int) -> GameStatusResponse:
 
 @router.post("/{player_id}")
 def create_game(player_id: int, game_config: GameConfig) -> GameCreationResponse:
-    player = get_player_by_id(player_id=player_id)
     game_state = GameState(
         player_id=player_id,
         game_word=get_game_word(words_list=AllWords.words),
