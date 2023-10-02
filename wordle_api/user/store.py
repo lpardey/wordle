@@ -187,7 +187,7 @@ class UserStoreDict(UserStore):
 
     def create_user(self, username: str, password: str) -> int:
         if not self._check_username_is_available(username):
-            message = f"Username {username} is unavailable"
+            message = f"Username '{username}' is unavailable"
             raise StoreExceptionAlreadyInUse(message)
         try:
             new_user_id = self._get_new_user_id()
@@ -232,7 +232,7 @@ class UserStoreDict(UserStore):
     def update_user(self, user: User) -> None:
         old_user = self.get_user_by_id(user.id)
         if not self._check_username_is_available(user.username):
-            message = f"Username {user.username} is unavailable"
+            message = f"Username '{user.username}' is unavailable"
             raise StoreExceptionAlreadyInUse(message)
         try:
             self.data[user.id] = user

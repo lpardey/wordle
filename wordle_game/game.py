@@ -60,17 +60,17 @@ class WordleGame:
     @staticmethod
     def validate_guess(guess: str) -> None:
         if not guess.isalpha():
-            raise WordleException(f"Invalid guess. At least one of the characters in '{guess}' is not alphabetic.")
+            raise WordleException(f"Invalid guess: At least one of the characters in '{guess}' is not alphabetic.")
 
         if len(guess) != 5:
-            raise WordleException(f"Invalid guess. '{guess}' does not have 5 letters.")
+            raise WordleException(f"Invalid guess: '{guess}' does not have 5 letters.")
 
         if guess not in AllWords.words:
-            raise WordleException(f"Invalid guess. '{guess}' is not a word.")
+            raise WordleException(f"Invalid guess: '{guess}' is not a word.")
 
     def validate_game_status(self) -> None:
         if self.game_state.status == GameStatus.FINISHED:
-            raise WordleException(f"Game is over!")
+            raise WordleException("Game is over!")
 
     def add_guess(self, guess: str) -> None:
         guess = guess.upper()

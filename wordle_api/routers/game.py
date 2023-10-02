@@ -2,7 +2,7 @@ from fastapi import HTTPException, APIRouter, Request
 from wordle_client.game_word import AllWords, get_game_word
 from wordle_game.game import WordleException, WordleGame
 from wordle_game.game_storage import GameStorage
-from wordle_game.player_storage import get_game_state_by_id, get_player_by_id
+from wordle_game.player_storage import get_game_state_by_id
 from wordle_schemas.game import (
     BasicStatus,
     GameCreationResponse,
@@ -15,7 +15,7 @@ from wordle_schemas.game import (
 )
 from wordle_game.game_state import GameState
 
-from wordle_api.user.auth import authorized_endpoint
+# from wordle_api.user.auth import authorized_endpoint
 
 router = APIRouter(prefix="/game", tags=["Game"])
 
