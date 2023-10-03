@@ -1,7 +1,7 @@
 from unittest import mock
 from fastapi import HTTPException
 import pytest
-from wordle_api.routers.game import create_game, get_game_status, take_a_guess
+from wordle_api.game.router import create_game, get_game_status, take_a_guess
 from wordle_game.game import WordleGame
 from wordle_game.game_state import GameState, GameStatus, GuessResult, LetterStatus
 from wordle_game.game_storage import GameStorage
