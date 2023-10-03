@@ -1,5 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class GameResult(str, Enum):
@@ -35,6 +36,7 @@ class GameState(BaseModel):
     number_of_attempts: int = 6
     result: GameResult = GameResult.DEFEAT
     difficulty: GameDifficulty = GameDifficulty.NORMAL
+    game_creation_date: datetime
 
     @property
     def guesses_left(self) -> int:

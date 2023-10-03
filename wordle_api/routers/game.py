@@ -1,8 +1,7 @@
-from fastapi import HTTPException, APIRouter, Request
+from fastapi import HTTPException, APIRouter
 from wordle_client.game_word import AllWords, get_game_word
 from wordle_game.game import WordleException, WordleGame
 from wordle_game.game_storage import GameStorage
-from wordle_game.player_storage import get_game_state_by_id
 from wordle_schemas.game import (
     BasicStatus,
     GameCreationResponse,
@@ -14,16 +13,19 @@ from wordle_schemas.game import (
     TakeAGuessResponse,
 )
 from wordle_game.game_state import GameState
+from datetime import datetime
 
 # from wordle_api.user.auth import authorized_endpoint
 
 router = APIRouter(prefix="/game", tags=["Game"])
 
+GAME_STORAGE = GameStorage()
+
 
 @router.get("/{game_id}")
 # @authorized_endpoint
-def get_game_status(request: Request, game_id: int) -> GameStatusResponse:
-    game_state = get_game_state_by_id(game_id=game_id)
+def get_game_status(game_id: int) -> GameStatusResponse:
+    game_state = GAME_STORAGE.get_game_state(game_id)
     wordle = WordleGame(game_state=game_state)
     guesses = [
         Guess(word=guess, letters_status=wordle.compare(guess, game_state.game_word)) for guess in game_state.guesses
@@ -47,14 +49,15 @@ def create_game(player_id: int, game_config: GameConfig) -> GameCreationResponse
         game_word=get_game_word(words_list=AllWords.words),
         number_of_attempts=game_config.number_of_attempts,
         difficulty=game_config.game_difficulty,
+        game_creation_date=datetime.now(),
     )
-    game_id = GameStorage().add_game_state(game_state=game_state)
+    game_id = GAME_STORAGE.add_game_state(game_state=game_state)
     return GameCreationResponse(game_id=game_id)
 
 
 @router.post("/{player_id}/{game_id}/guess")
 def take_a_guess(player_id: int, game_id: int, guess_request: TakeAGuessRequest) -> TakeAGuessResponse:
-    game_state = get_game_state_by_id(game_id=game_id)
+    game_state = GAME_STORAGE.get_game_state(game_id=game_id)
 
     if game_state.player_id != player_id:
         raise HTTPException(status_code=403, detail="FORBIDDEN")
