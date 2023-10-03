@@ -122,10 +122,10 @@ class SessionStoreDict(SessionStore):
 
         user_session = self.data[session_id]
 
-        # if user_session.expiration_date < datetime.now():
-        #    self.delete_session(session_id)
-        #    message = f"Session expired: {user_session.token}"
-        #    raise StoreExceptionNotFound(message)
+        if user_session.expiration_date < datetime.now():
+            self.delete_session(session_id)
+            message = f"Session expired: {user_session.token}"
+            raise StoreExceptionNotFound(message)
 
         return user_session
 
@@ -133,7 +133,7 @@ class SessionStoreDict(SessionStore):
         try:
             new_session_id = self._get_new_session_id()
             token = self._get_new_token()
-            date = datetime.now() + timedelta(days=1)  # esto lo ponemos para que el token dure 1 dia por defecto
+            date = datetime.now() + timedelta(days=1)
             user_session = UserSession(session_id=new_session_id, user_id=user_id, token=token, expiration_date=date)
             self.data[new_session_id] = user_session
             self.token_index[token] = new_session_id
@@ -244,7 +244,7 @@ class UserStoreDict(UserStore):
 
 """
 metodo de instancia
-metodo de clase 
+metodo de clase
 metodo estatico
 
 y todos esos metodos pueden ser concretos o abstractos.

@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from datetime import datetime
 
 
 class AuthenticatedRequest(BaseModel):
@@ -8,6 +9,10 @@ class AuthenticatedRequest(BaseModel):
 class SignUpRequest(BaseModel):
     username: str
     password: str
+
+
+class SignUpResponse(BaseModel):
+    player_id: int
 
 
 class UpdateRequest(BaseModel):
@@ -21,5 +26,7 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    access_token: str
-    token_type: str
+    player_id: int
+    session_id: int
+    token: str
+    session_expiration_date: datetime

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Request, status
 from fastapi.exceptions import HTTPException
-from wordle_api.user.auth import authorized_endpoint
+
+# from wordle_api.user.auth import authorized_endpoint
 from wordle_api.user.models import User
 from .store import (
     SessionStore,
@@ -11,7 +12,7 @@ from .store import (
     UserStoreDict,
     UserStore,
 )
-from .schemas import SignUpRequest, LoginRequest, LoginResponse, UpdateRequest
+from .schemas import SignUpRequest, LoginRequest, LoginResponse, SignUpResponse, UpdateRequest
 from wordle_api.auth.utils import authenticate_user, get_password_hash
 
 router = APIRouter(prefix="/account", tags=["Account"])
@@ -28,7 +29,7 @@ def is_user_available(username: str) -> None:
 
 
 @router.put("/update/{user_id}")
-#@authorized_endpoint
+# @authorized_endpoint
 def update_user(request: Request, user_id: int, update_request: UpdateRequest) -> None:
     try:
         user_store: UserStore = UserStoreDict.get_instance()
@@ -43,7 +44,7 @@ def update_user(request: Request, user_id: int, update_request: UpdateRequest) -
 
 
 @router.delete("/delete/{user_id}")
-#@authorized_endpoint
+# @authorized_endpoint
 def delete_user(request: Request, user_id: int) -> None:
     try:
         user_store: UserStore = UserStoreDict.get_instance()
@@ -61,6 +62,7 @@ def get_user(username: str) -> User:
     try:
         user_store: UserStore = UserStoreDict.get_instance()
         user = user_store.get_user(username)
+        return user
 
     except StoreExceptionNotFound as e:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=str(e))
@@ -68,15 +70,14 @@ def get_user(username: str) -> User:
     except StoreExceptionUnexpected as e:
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-    return user
-
 
 @router.post("/create")
-def create_user(request: SignUpRequest) -> None:
+def create_user(request: SignUpRequest) -> SignUpResponse:
     try:
         user_store: UserStore = UserStoreDict.get_instance()
         hashed_password = get_password_hash(request.password)
-        user_store.create_user(request.username, hashed_password)
+        player_id = user_store.create_user(request.username, hashed_password)
+        return SignUpResponse(player_id=player_id)
 
     except StoreExceptionAlreadyInUse as e:
         raise HTTPException(status.HTTP_409_CONFLICT, detail=str(e))
@@ -92,8 +93,12 @@ def login(request: LoginRequest) -> LoginResponse:
         session_store: SessionStore = SessionStoreDict.get_instance()
         session_id = session_store.create_session(user.id)
         session = session_store.get_session_by_id(session_id)
-        response = LoginResponse(access_token=session.token, token_type="bcrypt")  # token_type???
-        return response
+        return LoginResponse(
+            player_id=user.id,
+            session_id=session.session_id,
+            token=session.token,
+            session_expiration_date=session.expiration_date,
+        )
 
     except StoreExceptionNotFound:
         raise LOGIN_FAILED
