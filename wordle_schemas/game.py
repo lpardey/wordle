@@ -32,6 +32,7 @@ class Guess(BaseModel):
 
 
 class GameStatusInfo(BaseModel):
+    game_word: str
     guesses: list[Guess]
     attempts_left: int
     game_status: GameStatus
@@ -47,5 +48,7 @@ class TakeAGuessRequest(BaseModel):
 
 
 class TakeAGuessResponse(BasicResponse):
+    status: BasicStatus
+    message: str | None
     guess_result: GuessResult | None
     guess_letters_status: list[LetterStatus] | None

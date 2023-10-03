@@ -6,7 +6,7 @@ from wordle_game.game_storage import GameStorage
 
 @pytest.fixture()
 def basic_game_state() -> GameState:
-    game_state = GameState(user_id=0, game_word="PIZZA")
+    game_state = GameState(game_word="PIZZA")
     return game_state
 
 

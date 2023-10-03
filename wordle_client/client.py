@@ -45,7 +45,7 @@ class WordleClient:
 
     def create_game(self, game_config: GameConfig) -> GameCreationResponse:
         url = f"{self.service_url}/game"
-        response = requests.post(url=url, json=game_config.dict())
+        response = requests.post(url=url, json=game_config.model_dump())
         parsed_response = self.process_response(response=response, response_type=GameCreationResponse)
         return parsed_response
 
@@ -57,13 +57,13 @@ class WordleClient:
 
     def take_a_guess(self, game_id: int, guess_request: TakeAGuessRequest) -> TakeAGuessResponse:
         url = f"{self.service_url}/game/{game_id}"
-        response = requests.post(url=url, json=guess_request.dict())
+        response = requests.post(url=url, json=guess_request.model_dump())
         parsed_response = self.process_response(response=response, response_type=TakeAGuessResponse)
         return parsed_response
 
     def health_check(self) -> BasicResponse:
         url = f"{self.service_url}/healthcheck"
-        response = requests.get(url)
+        response = requests.get(url=url)
         parsed_response = self.process_response(response, BasicResponse)
         return parsed_response
 

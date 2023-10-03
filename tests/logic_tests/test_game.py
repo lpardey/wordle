@@ -2,6 +2,8 @@ import pytest
 from unittest import mock
 from wordle_game.game_state import GameResult, GameState, GameStatus, GuessResult
 from wordle_game.game import WordleException, WordleGame
+from wordle_game.player import Player
+from wordle_game.player_statistics import PlayerStatistics
 
 
 @pytest.mark.parametrize(
@@ -41,7 +43,7 @@ def test_validate_guess_success(basic_wordle_game: WordleGame):
 @mock.patch.object(GameState, "status", new_callable=mock.PropertyMock)
 def test_validate_status_failure(m_game_state_status: mock.Mock, status: GameStatus, expected_result: str):
     m_game_state_status.return_value = status
-    game_state = GameState(user_id=0, game_word="PIZZA")
+    game_state = GameState(player=Player(statistics=PlayerStatistics()),game_word="PIZZA")
     wordle = WordleGame(game_state=game_state)
     with pytest.raises(WordleException) as exc_info:
         wordle.validate_game_status()
@@ -104,7 +106,7 @@ def test_add_guess(expected_result: list[str], guesses: list[str], guess: str, b
     ],
 )
 def test_is_victory(expected_result: bool, guesses: list[str]):
-    game_state = GameState(user_id=0, game_word="PIZZA", guesses=guesses)
+    game_state = GameState(player=Player(statistics=PlayerStatistics()), game_word="PIZZA", guesses=guesses)
     wordle = WordleGame(game_state=game_state)
     result = wordle.is_victory()
     assert result == expected_result
@@ -198,7 +200,7 @@ def test_guess_success(
     assert m_validate_guess.call_args_list[0][1]["guess"] == guess
 
     assert m_validate_game_status.call_count == 1
- 
+
     assert m_add_guess.call_count == 1
     assert m_add_guess.call_args_list[0][1]["guess"] == guess
 
@@ -218,9 +220,19 @@ def test_guess_success(
             id="guess is not alphabetic",
         ),
         pytest.param(
-            "SHEEPY", GameStatus.WAITING_FOR_GUESS, WordleException("Invalid guess. 'SHEEPY' does not have 5 letters."), None, id="Guess doesn't have 5 letters"
+            "SHEEPY",
+            GameStatus.WAITING_FOR_GUESS,
+            WordleException("Invalid guess. 'SHEEPY' does not have 5 letters."),
+            None,
+            id="Guess doesn't have 5 letters",
         ),
-        pytest.param("NOWOR", GameStatus.WAITING_FOR_GUESS, WordleException("Invalid guess. 'NOWOR' is not a word."), None, id="Guess is not a word"),
+        pytest.param(
+            "NOWOR",
+            GameStatus.WAITING_FOR_GUESS,
+            WordleException("Invalid guess. 'NOWOR' is not a word."),
+            None,
+            id="Guess is not a word",
+        ),
         pytest.param("SHEEP", GameStatus.FINISHED, None, WordleException("Game is over!"), id="Game is finished"),
     ],
 )

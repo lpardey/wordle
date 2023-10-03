@@ -1,3 +1,4 @@
+import time
 from wordle_game.game_state import (
     GameResult,
     GameState,
@@ -5,9 +6,10 @@ from wordle_game.game_state import (
     GuessResult,
     LetterStatus,
 )
-import time
+from wordle_client.game_word import AllWords
 
-FIVE_LETTER_WORDS = {"PIZZA", "SHEEP", "JAZZY", "CHOKE", "FUSED", "BOOBS", "JUMBO", "PLAZA", "PIANO"}
+
+# FIVE_LETTER_WORDS: list[str] = get_words_list()
 
 
 class WordleException(Exception):
@@ -17,7 +19,6 @@ class WordleException(Exception):
 class WordleGame:
     def __init__(self, game_state: GameState) -> None:
         self.game_state = game_state
-        self.game_state.game_word = game_state.game_word.upper()
 
     def guess(self, guess: str) -> GuessResult:
         self.validate_game_status()
@@ -59,17 +60,17 @@ class WordleGame:
     @staticmethod
     def validate_guess(guess: str) -> None:
         if not guess.isalpha():
-            raise WordleException(f"Invalid guess. At least one of the characters in '{guess}' is not alphabetic.")
+            raise WordleException(f"Invalid guess: At least one of the characters in '{guess}' is not alphabetic.")
 
         if len(guess) != 5:
-            raise WordleException(f"Invalid guess. '{guess}' does not have 5 letters.")
+            raise WordleException(f"Invalid guess: '{guess}' does not have 5 letters.")
 
-        if guess not in FIVE_LETTER_WORDS:
-            raise WordleException(f"Invalid guess. '{guess}' is not a word.")
+        if guess not in AllWords.words:
+            raise WordleException(f"Invalid guess: '{guess}' is not a word.")
 
     def validate_game_status(self) -> None:
         if self.game_state.status == GameStatus.FINISHED:
-            raise WordleException(f"Game is over!")
+            raise WordleException("Game is over!")
 
     def add_guess(self, guess: str) -> None:
         guess = guess.upper()

@@ -28,9 +28,9 @@ API
             {"status": "OK", "msg": null}
             {"status": "ERROR", "msg": "Game status is not WAITING_FOR_GUESS"}
 
-        * The game is always created depending on the user's IP. A new game is created
+        * The game is always created depending on the player's IP. A new game is created
         every 24 hours since the last game played. If the player ends a current game, he must wait
-        24 hours to play a new game. (Other option) A game is created depending on the user's credentials.
+        24 hours to play a new game. (Other option) A game is created depending on the player's credentials.
 
 
 CLIENT
@@ -42,17 +42,17 @@ CLIENT
             - Create a game
                 POST /game
                 
-                Which user is asking to create a game?
+                Which player is asking to create a game?
 
                 Response:
-                    {game: {game_id: user}}
+                    {game: {game_id: player}}
 
             - Join the game
 
             - Take a guess
                 POST /game/{game_id}/guess
 
-                Send the user who is making the request to check who is doing it.
+                Send the player who is making the request to check who is doing it.
                 Send the guess(str)
 
                 necesitaras mandar de alguna manera que usuario esta haciendo la peticion.
@@ -82,8 +82,8 @@ CLIENT
 
             - End game
 
-        User:
-            - Create user
+        player:
+            - Create player
             - Log-in
             - Get player stats
             - Log-out
@@ -173,3 +173,11 @@ CORE
 INTERFACE
 
     TypeScript - REACT
+
+
+Pendientes
+
+    1. Autenticacion de usuario y eso.
+    2. Añadir Game statistics (games played, winning percentage, current streak, max streak, number of guesses on attempt x, etc).
+    3. Resolver lo del game storage segun entiendo es pocho.
+    4. Añadir funcionalidad que permita jugar solo una partida cada 24 horas si el usuario pierde

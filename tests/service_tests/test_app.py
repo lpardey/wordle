@@ -1,7 +1,7 @@
 from unittest import mock
 from fastapi import HTTPException
 import pytest
-from wordle_api.game.router import create_game, get_game_status, take_a_guess
+from wordle_api.routers.game import create_game, get_game_status, take_a_guess
 from wordle_game.game import WordleGame
 from wordle_game.game_state import GameState, GameStatus, GuessResult, LetterStatus
 from wordle_game.game_storage import GameStorage
@@ -13,8 +13,9 @@ from wordle_schemas.game import (
     GameStatusResponse,
     TakeAGuessRequest,
 )
+from tests.logic_tests.conftest import basic_game_state, basic_wordle_game, basic_game_storage
 
-
+#TODO: update
 @mock.patch.object(GameStorage, "add_game_state", return_value=0)
 def test_create_game(m_add_game_state: mock.Mock):
     game_config = GameConfig()

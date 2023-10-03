@@ -1,7 +1,7 @@
 import pytest
-from wordle_game.user import User
+from wordle_game.player import Player
 
 
 @pytest.fixture()
-def user() -> User:
-    return User(user_id=0, username="guillermo", password="12345")
+def player() -> Player:
+    return Player()
