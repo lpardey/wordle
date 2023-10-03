@@ -48,5 +48,7 @@ class TakeAGuessRequest(BaseModel):
 
 
 class TakeAGuessResponse(BasicResponse):
+    status: BasicStatus
+    message: str | None
     guess_result: GuessResult | None
     guess_letters_status: list[LetterStatus] | None
