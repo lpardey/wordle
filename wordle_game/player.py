@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from wordle_game.game_storage import GameStorage
 from wordle_game.player_statistics import PlayerStatistics
 
 
