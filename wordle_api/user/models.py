@@ -1,18 +1,20 @@
-from datetime import datetime
-from pydantic import BaseModel
+from tortoise.models import Model
+from tortoise import fields
+from wordle_api.game.models import Game
 
 
-class User(BaseModel):
-    id: int
-    username: str
-    # en verdad nunca querremos guardar passwords en texto plano
-    # pero de momento en este ejemplo vamos a ir tirando con eso
-    password: str
-    disabled: bool = False
+class User(Model):
+    id = fields.IntField(pk=True)
+    username = fields.CharField(max_length=20)
+    password = fields.CharField(max_length=20)
+    disabled = fields.BooleanField(default=False)
+
+    games: fields.ReverseRelation["Game"]
+    sessions: fields.ReverseRelation["UserSession"]
 
 
-class UserSession(BaseModel):
-    session_id: int
-    user_id: int
-    token: str
-    expiration_date: datetime
+class UserSession(Model):
+    session_id = fields.IntField(pk=True)
+    user_id = fields.ForeignKeyField("User", related_name="sessions")
+    token = fields.CharField(max_length=20)
+    expiration_date = fields.DatetimeField()
