@@ -12,9 +12,24 @@ class User(Model):
     games: fields.ReverseRelation["Game"]
     sessions: fields.ReverseRelation["UserSession"]
 
+    class Meta:
+        table = "User"
+        table_description = "Information regarding a user"
+
+    def __str__(self) -> str:
+        return f"User {self.id}: '{self.username}'"
+
 
 class UserSession(Model):
     session_id = fields.IntField(pk=True)
-    user_id = fields.ForeignKeyField("User", related_name="sessions")
+    user_id = fields.ForeignKeyField("models.User", related_name="sessions")
     token = fields.CharField(max_length=20)
-    expiration_date = fields.DatetimeField()
+    session_creation_date = fields.DatetimeField(auto_now_add=True)
+
+    class Meta:
+        table = "User Session"
+        table_description = "Information regarding a user's session"
+
+    def __str__(self) -> str:
+        message = f"Session {self.session_id} for user {self.user_id} created: {self.session_creation_date}"
+        return message
