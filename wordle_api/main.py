@@ -4,10 +4,10 @@ from wordle_api.game import router
 from wordle_api.user.router import router as user_router
 
 # from wordle_api.auth.asdf import router as auth_router
-from .game.connect_to_db import connect_to_db
+# from .game.connect_to_db import connect_to_db
 
 app = FastAPI()
-await connect_to_db()
+# await connect_to_db()
 
 origins = ["*"]
 
