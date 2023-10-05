@@ -5,7 +5,7 @@ from tortoise import fields
 
 class Game(Model):
     id = fields.IntField(pk=True)
-    player_id = fields.ForeignKeyField("User", related_name="games")
+    player_id = fields.ForeignKeyField("models.User", related_name="games")
     game_word = fields.CharField(max_length=5)
     max_attempts = fields.IntField()
     difficulty = fields.CharEnumField(GameDifficulty)
@@ -13,7 +13,7 @@ class Game(Model):
     guesses: fields.ReverseRelation["Guess"]
 
     def __str__(self) -> str:
-        return f"Game {self.id}: {self.game_creation_date}"
+        return f"Game {self.id} for user {self.player_id} created: {self.game_creation_date}"
 
     @property
     async def guesses_left(self) -> int:
@@ -37,24 +37,19 @@ class Game(Model):
             return GameResult.VICTORY
         return GameResult.DEFEAT
 
-    # class Meta:
-    #    schema = "Game State"
-    #    table = "game_state"
-    #    table_description = "Information regarding a game state"
+    class Meta:
+        table = "Game"
+        table_description = "Information regarding a game"
 
 
 class Guess(Model):
     id = fields.IntField(pk=True)
-    game_id = fields.ForeignKeyField("Game", related_name="guesses")
+    game_id = fields.ForeignKeyField("models.Game", related_name="guesses")
     value = fields.CharField(max_length=5)
-    letters_status = []
 
+    class Meta:
+        table = "Guess"
+        table_description = "Information regarding a guess"
 
-# class GameState(BaseModel):
-#     player_id: int
-#     game_word: str
-#     guesses: list[str] = []
-#     number_of_attempts: int = 6
-#     result: GameResult = GameResult.DEFEAT
-#     difficulty: GameDifficulty = GameDifficulty.NORMAL
-#     game_creation_date: datetime
+    def __str__(self) -> str:
+        return f"Guess {self.id} for game {self.game_id}: '{self.value}'"
