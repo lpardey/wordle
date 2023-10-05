@@ -1,12 +1,8 @@
-from tortoise import Tortoise, run_async
+from tortoise import Tortoise
 
 
-async def init():
+async def connect_to_db() -> None:
     await Tortoise.init(
         db_url="sqlite://db.sqlite3",
         modules={"models": ["wordle_api.game.models"]},
     )
-    await Tortoise.generate_schemas()
-
-
-run_async(init())
