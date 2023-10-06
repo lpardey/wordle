@@ -1,5 +1,5 @@
+from .database.connect_to_db import connect_to_db
 from tortoise import Tortoise, run_async
-from .connect_to_db import connect_to_db
 
 
 async def main() -> None:
