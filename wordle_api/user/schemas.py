@@ -29,4 +29,5 @@ class LoginResponse(BaseModel):
     player_id: int
     session_id: int
     token: str
+    session_creation_date: datetime
     session_expiration_date: datetime
