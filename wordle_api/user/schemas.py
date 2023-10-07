@@ -12,7 +12,7 @@ class SignUpRequest(BaseModel):
 
 
 class SignUpResponse(BaseModel):
-    player_id: int
+    user_id: int
 
 
 class UpdateRequest(BaseModel):
@@ -26,8 +26,7 @@ class LoginRequest(BaseModel):
 
 
 class LoginResponse(BaseModel):
-    player_id: int
     session_id: int
+    user_id: int
     token: str
     session_creation_date: datetime
-    session_expiration_date: datetime
