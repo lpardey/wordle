@@ -2,11 +2,12 @@ from tortoise.models import Model
 from tortoise import fields
 from wordle_game.game_state import GameResult, GameDifficulty, GameStatus
 from .guess import Guess
+from tortoise.contrib.pydantic import pydantic_model_creator
 
 
 class Game(Model):
     id = fields.IntField(pk=True)
-    player_id = fields.ForeignKeyField("models.User", related_name="games")
+    user = fields.ForeignKeyField("models.User", related_name="games")
     game_word = fields.CharField(max_length=5)
     max_attempts = fields.IntField()
     difficulty = fields.CharEnumField(GameDifficulty)
@@ -14,7 +15,7 @@ class Game(Model):
     guesses: fields.ReverseRelation["Guess"]
 
     def __str__(self) -> str:
-        return f"Game {self.id} for user {self.player_id} created: {self.game_creation_date}"
+        return f"Game {self.id} for user {self.user_id} created: {self.game_creation_date}"
 
     @property
     async def guesses_left(self) -> int:
@@ -41,3 +42,6 @@ class Game(Model):
     class Meta:
         table = "Game"
         table_description = "Information regarding a game"
+
+
+Game_Pydantic = pydantic_model_creator(Game, name="Game")
