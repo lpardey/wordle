@@ -1,10 +1,17 @@
-from .database.connect_to_db import connect_to_db
+from .database.initialize_db import initialize_db
 from tortoise import Tortoise, run_async
 
 
 async def main() -> None:
-    await connect_to_db()
+    await initialize_db()
     await Tortoise.generate_schemas()
+
+
+async def drop_all_tables():
+    await initialize_db()
+    await Tortoise.generate_schemas()
+    await Tortoise._drop_databases()
+    await Tortoise.close_connections()
 
 
 if __name__ == "__main__":
