@@ -8,10 +8,6 @@ class Guess(Model):
     game = fields.ForeignKeyField("models.Game", related_name="guesses")
     value = fields.CharField(max_length=5)
 
-    class Meta:
-        table = "Guess"
-        table_description = "Information regarding a guess"
-
     def __str__(self) -> str:
         return f"Guess {self.id} for game {self.game_id}: '{self.value}'"
 
