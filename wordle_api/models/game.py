@@ -9,9 +9,10 @@ class Game(Model):
     id = fields.IntField(pk=True)
     user = fields.ForeignKeyField("models.User", related_name="games")
     game_word = fields.CharField(max_length=5)
-    max_attempts = fields.IntField()
-    difficulty = fields.CharEnumField(GameDifficulty)
+    max_attempts = fields.SmallIntField()
+    difficulty = fields.IntEnumField(enum_type=GameDifficulty)
     game_creation_date = fields.DatetimeField(auto_now_add=True)
+
     guesses: fields.ReverseRelation["Guess"]
 
     def __str__(self) -> str:
@@ -38,10 +39,6 @@ class Game(Model):
         if last_guess.value == self.game_word:
             return GameResult.VICTORY
         return GameResult.DEFEAT
-
-    class Meta:
-        table = "Game"
-        table_description = "Information regarding a game"
 
 
 Game_Pydantic = pydantic_model_creator(Game, name="Game")
