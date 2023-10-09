@@ -16,3 +16,4 @@ async def drop_all_tables():
 
 if __name__ == "__main__":
     run_async(main())
+    # run_async(drop_all_tables())
