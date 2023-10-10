@@ -1,41 +1,28 @@
 from fastapi import HTTPException, APIRouter, status
-from wordle_api.models import Game, Game_Pydantic
+from wordle_api.models import Game, Guess, Game_Pydantic
 from wordle_api.schemas.game_schemas import (
     BasicStatus,
     CreateGameRequest,
     CreateGameResponse,
-    GameStatusInfo,
-    GameStatusResponse,
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
 from wordle_client.game_word import AllWords, get_game_word
 from wordle_game.game import WordleException, WordleGame
-from wordle_game.game_state import GameState
+from wordle_game.game_state import GameState, GameStatus
 
 # from wordle_api.user.auth import authorized_endpoint
 
 router = APIRouter(prefix="/game", tags=["Game"])
 
 
-@router.get("/{game_id}")
+@router.get("/{game_id}", response_model=Game_Pydantic)
 # @authorized_endpoint
-async def get_game_status(game_id: int) -> GameStatusResponse:
+async def get_game_status(game_id: int):
     game = await Game.get_or_none(id=game_id)
     if game is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
-    # a = await Game_Pydantic.from_tortoise_orm(game)
-    response = GameStatusResponse(
-        game_status_info=GameStatusInfo(
-            game_word=game.game_word,
-            guesses=await game.guesses.all(),
-            attempts_left=await game.guesses_left,
-            game_status=await game.status,
-            difficulty=game.difficulty,
-        )
-    )
-    return response
-    # return a
+    return await Game_Pydantic.from_tortoise_orm(game)
 
 
 @router.post("/{user_id}")
@@ -64,10 +51,8 @@ async def take_a_guess(user_id: int, game_id: int, guess_request: TakeAGuessRequ
         player_id=user_id,
         game_word=game_query.game_word,
         guesses=await game_query.guesses,
-        number_of_attempts=await game_query.guesses_left,
-        result=await game_query.result,
         difficulty=game_query.difficulty,
-        game_creation_date=game_query.game_creation_date,
+        creation_date=game_query.creation_date,
     )
     wordle = WordleGame(game_state)
     game_status = BasicStatus.OK
@@ -77,6 +62,9 @@ async def take_a_guess(user_id: int, game_id: int, guess_request: TakeAGuessRequ
     try:
         guess_result = wordle.guess(guess=guess)
         guess_letters_status = wordle.compare(guess, game_query.game_word)
+        if game_state.status == GameStatus.WAITING_FOR_GUESS:
+            await Guess.create(game_id=game_id, value=guess)
+        raise WordleException
     except WordleException as e:
         game_status = BasicStatus.ERROR
         message = str(e)
