@@ -34,7 +34,7 @@ class GameState(BaseModel):
     game_word: str
     guesses: list[str] = []
     number_of_attempts: int = 6
-    result: GameResult = GameResult.DEFEAT
+    result: GameResult | None = GameResult.DEFEAT
     difficulty: GameDifficulty = GameDifficulty.NORMAL
     game_creation_date: datetime
 
