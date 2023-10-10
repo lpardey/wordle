@@ -8,6 +8,7 @@ from wordle_api.routers.user_router import router as user_router
 
 # from wordle_api.auth.asdf import router as auth_router
 
+
 app = FastAPI(title="Wordlematic")
 
 
@@ -31,6 +32,6 @@ register_tortoise(
     app,
     db_url="sqlite://db.sqlite3",
     modules={"models": ["wordle_api.models"]},
-    generate_schemas=True,
     add_exception_handlers=True,
+    generate_schemas=True,
 )
