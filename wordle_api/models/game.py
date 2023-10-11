@@ -1,6 +1,6 @@
 from tortoise.models import Model
 from tortoise import fields
-from wordle_game.game_state import GameDifficulty
+from wordle_game.game_enums import GameDifficulty, GameResult, GameStatus
 from .guess import Guess
 from typing import TYPE_CHECKING
 
@@ -20,24 +20,24 @@ class Game(Model):
     def __str__(self) -> str:
         return f"Game {self.id} for user {self.user.id} created: {self.creation_date}"
 
-    # @property
-    # async def guesses_left(self) -> int:
-    #     return self.max_attempts - await self.guesses.all().count()
+    @property
+    async def guesses_left(self) -> int:
+        return self.max_attempts - await self.guesses.all().count()
 
-    # @property
-    # async def status(self) -> GameStatus:
-    #     if await self.guesses_left > 0 and await self.result != GameResult.VICTORY:
-    #         return GameStatus.WAITING_FOR_GUESS
-    #     return GameStatus.FINISHED
+    @property
+    async def status(self) -> GameStatus:
+        if await self.guesses_left > 0 and await self.result != GameResult.VICTORY:
+            return GameStatus.WAITING_FOR_GUESS
+        return GameStatus.FINISHED
 
-    # @property
-    # async def result(self) -> GameResult | None:
-    #     guesses_left = await self.guesses_left
-    #     last_guess = await self.guesses.all().order_by("-id").first()
-    #     if last_guess is None:
-    #         return None
-    #     if guesses_left > 0 and last_guess.value != self.game_word:
-    #         return None
-    #     if last_guess.value == self.game_word:
-    #         return GameResult.VICTORY
-    #     return GameResult.DEFEAT
+    @property
+    async def result(self) -> GameResult | None:
+        guesses_left = await self.guesses_left
+        last_guess = await self.guesses.all().order_by("-id").first()
+        if last_guess is None:
+            return None
+        if guesses_left > 0 and last_guess.value != self.game_word:
+            return None
+        if last_guess.value == self.game_word:
+            return GameResult.VICTORY
+        return GameResult.DEFEAT
