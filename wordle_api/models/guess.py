@@ -1,15 +1,15 @@
 from tortoise.models import Model
 from tortoise import fields
-from tortoise.contrib.pydantic import pydantic_model_creator
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .game import Game
 
 
 class Guess(Model):
     id = fields.IntField(pk=True)
-    game = fields.ForeignKeyField("models.Game", related_name="guesses")
     value = fields.CharField(max_length=5)
+    game: fields.ForeignKeyRelation["Game"] = fields.ForeignKeyField("models.Game", related_name="guesses")
 
     def __str__(self) -> str:
-        return f"Guess {self.id} for game {self.game_id}: '{self.value}'"
-
-
-Guess_Pydantic = pydantic_model_creator(Guess, name="Guess")
+        return f"Guess {self.id} for game {self.game.id}: '{self.value}'"
