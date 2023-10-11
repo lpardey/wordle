@@ -1,4 +1,3 @@
-from wordle_api.database.initialize_db import initialize_db
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -10,12 +9,6 @@ from wordle_api.routers.user_router import router as user_router
 
 
 app = FastAPI(title="Wordlematic")
-
-
-@app.on_event("startup")
-async def startup_db():
-    await initialize_db()
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -31,7 +24,7 @@ app.include_router(game_router)
 register_tortoise(
     app,
     db_url="sqlite://db.sqlite3",
-    modules={"models": ["wordle_api.models"]},
+    modules={"models": ["wordle_api.models", "wordle_api.pydantic_models"]},
     add_exception_handlers=True,
     generate_schemas=True,
 )
