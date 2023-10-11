@@ -1,5 +1,6 @@
+from wordle_api.models import Guess, Game
 from wordle_client.game_word import AllWords
-from wordle_game.game_state import GameState, GameResult, GameStatus, LetterStatus, GuessResult
+from wordle_game.game_enums import GameResult, GameStatus, LetterStatus, GuessResult
 
 # FIVE_LETTER_WORDS: list[str] = get_words_list()
 
@@ -9,55 +10,33 @@ class WordleException(Exception):
 
 
 class WordleGame:
-    def __init__(self, game: GameState) -> None:
+    def __init__(self, game: Game) -> None:
         self.game = game
 
-    def guess(self, guess: str) -> GuessResult:
-        self.validate_game_status()
-        self.validate_guess(guess=guess)
-        self.add_guess(guess=guess)  # If we reach this point, both the guess and the status are valid
-        guess_result = self.update_game_state()
+    async def guess(self, guess: str) -> GuessResult:
+        await self.validate_game_status()
+        self.validate_guess(guess)
+        await Guess.create(game_id=self.game.id, value=guess)
+        guess_result = await self.get_guess_result()
         return guess_result
 
     @staticmethod
     def validate_guess(guess: str) -> None:
         if not guess.isalpha():
             raise WordleException(f"Invalid guess: At least one of the characters in '{guess}' is not alphabetic.")
-
         if len(guess) != 5:
             raise WordleException(f"Invalid guess: '{guess}' does not have 5 letters.")
-
         if guess not in AllWords.words:
             raise WordleException(f"Invalid guess: '{guess}' is not a word.")
 
-    def validate_game_status(self) -> None:
-        if self.game.status == GameStatus.FINISHED:
+    async def validate_game_status(self) -> None:
+        if await self.game.status == GameStatus.FINISHED:
             raise WordleException("Game is over!")
 
-    def add_guess(self, guess: str) -> None:
-        guess = guess.upper()
-        self.game.guesses.append(guess)
-
-    def update_game_state(self) -> GuessResult:
-        if self.is_victory():
-            self.game.result = GameResult.VICTORY
+    async def get_guess_result(self) -> GuessResult:
+        if await self.game.result == GameResult.VICTORY:
             return GuessResult.GUESSED
-
-        if self.is_defeat():
-            self.game.result = GameResult.DEFEAT
-
         return GuessResult.NOT_GUESSED
-
-    def is_victory(self) -> bool:
-        if self.game.guesses == []:
-            return False
-
-        word = self.game.game_word
-        guess = self.game.guesses[-1]
-        return word == guess
-
-    def is_defeat(self) -> bool:
-        return self.game.guesses_left == 0
 
     @staticmethod
     def compare(guess: str, word: str) -> list[LetterStatus]:
