@@ -2,7 +2,8 @@ from fastapi import APIRouter, status
 from fastapi.exceptions import HTTPException
 from wordle_api.schemas.user_schemas import SignUpRequest, SignUpResponse, LoginRequest
 from wordle_api.auth.utils import AuthException, authenticate_user, get_password_hash
-from wordle_api.models import User, UserSession, User_Pydantic, UserSession_Pydantic
+from wordle_api.pydantic_models import User_Pydantic, UserSession_Pydantic
+from wordle_api.models import User, UserSession
 
 router = APIRouter(prefix="/account", tags=["Account"])
 
