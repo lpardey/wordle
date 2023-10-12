@@ -1,6 +1,6 @@
 from enum import Enum
 from pydantic import BaseModel
-from wordle_game.game_enums import GameDifficulty, GuessResult, LetterStatus
+from wordle_api.services.resources.schemas import GameDifficulty, GuessResult, LetterStatus
 
 # schema = transferir informacion --- esto va en la API
 # modelo = almacenar informacion --- esto va en la base de datos

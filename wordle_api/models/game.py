@@ -1,6 +1,6 @@
 from tortoise.models import Model
 from tortoise import fields
-from wordle_game.game_enums import GameDifficulty, GameResult, GameStatus
+from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus
 from .guess import Guess
 from typing import TYPE_CHECKING
 

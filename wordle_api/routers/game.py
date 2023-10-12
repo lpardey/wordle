@@ -1,7 +1,7 @@
 from fastapi import HTTPException, APIRouter, status
 from wordle_api.models import Game
 from wordle_api.pydantic_models import Game_Pydantic
-from wordle_api.schemas.game_schemas import (
+from wordle_api.schemas.game import (
     BasicStatus,
     CreateGameRequest,
     CreateGameResponse,
@@ -9,7 +9,7 @@ from wordle_api.schemas.game_schemas import (
     TakeAGuessResponse,
 )
 from wordle_client.game_word import AllWords, get_game_word
-from wordle_game.game import WordleException, WordleGame
+from wordle_api.services.game import WordleException, WordleGame
 
 # from wordle_api.user.auth import authorized_endpoint
 

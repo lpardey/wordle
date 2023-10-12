@@ -1,6 +1,6 @@
 from wordle_api.models import Guess, Game
 from wordle_client.game_word import AllWords
-from wordle_game.game_enums import GameResult, GameStatus, LetterStatus, GuessResult
+from wordle_api.services.resources.schemas import GameResult, GameStatus, LetterStatus, GuessResult
 
 # FIVE_LETTER_WORDS: list[str] = get_words_list()
 
