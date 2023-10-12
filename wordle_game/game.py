@@ -1,13 +1,6 @@
-import time
-from wordle_game.game_state import (
-    GameResult,
-    GameState,
-    GameStatus,
-    GuessResult,
-    LetterStatus,
-)
+from wordle_api.models import Guess, Game
 from wordle_client.game_word import AllWords
-
+from wordle_game.game_enums import GameResult, GameStatus, LetterStatus, GuessResult
 
 # FIVE_LETTER_WORDS: list[str] = get_words_list()
 
@@ -17,85 +10,33 @@ class WordleException(Exception):
 
 
 class WordleGame:
-    def __init__(self, game_state: GameState) -> None:
-        self.game_state = game_state
+    def __init__(self, game: Game) -> None:
+        self.game = game
 
-    def guess(self, guess: str) -> GuessResult:
-        self.validate_game_status()
-        self.validate_guess(guess=guess)
-        self.add_guess(guess=guess)  # If we reach this point, both the guess and the status are valid
-        guess_result = self.update_game_state()
+    async def guess(self, guess: str) -> GuessResult:
+        await self.validate_game_status()
+        self.validate_guess(guess)
+        await Guess.create(game_id=self.game.id, value=guess)
+        guess_result = await self.get_guess_result()
         return guess_result
-
-    # TODO: finish and check if it's going to be used
-    def new_game_countdown(self, time_in_seconds: int) -> None:
-        while time_in_seconds:
-            # minutes, seconds = divmod(time_in_seconds, 60)
-
-            # if minutes > 59:
-            #     hours, minutes = divmod(minutes, 60)
-            # else:
-            #     hours = 0
-
-            # print(f"{hours:02d}:{minutes:02d}:{seconds:02d}", end="\r")
-            time.sleep(1)
-            time_in_seconds -= 1
-
-        self.reset_game()
-
-    # TODO: finish and check if it's going to be used
-    def reset_game(self) -> None:
-        # Generar una nueva partida
-        #   Generar una nueva palabra
-        #   Resetar los attempts a 6
-        # self.game_state.status = GameStatus.WAITING_FOR_GUESS
-        # self.game_state.result = GameResult.DEFEAT
-        pass
-
-    # Auxiliary functions for guess ----------------------------------------------------------------------------------
-
-    # def add_guess_and_letter_status_result(guess: str, letter_status: list[LetterStatus]) -> list[tuple[str, list[LetterStatus]]]
-    # return list(zip(guess, letter_status))
 
     @staticmethod
     def validate_guess(guess: str) -> None:
         if not guess.isalpha():
             raise WordleException(f"Invalid guess: At least one of the characters in '{guess}' is not alphabetic.")
-
         if len(guess) != 5:
             raise WordleException(f"Invalid guess: '{guess}' does not have 5 letters.")
-
         if guess not in AllWords.words:
             raise WordleException(f"Invalid guess: '{guess}' is not a word.")
 
-    def validate_game_status(self) -> None:
-        if self.game_state.status == GameStatus.FINISHED:
+    async def validate_game_status(self) -> None:
+        if await self.game.status == GameStatus.FINISHED:
             raise WordleException("Game is over!")
 
-    def add_guess(self, guess: str) -> None:
-        guess = guess.upper()
-        self.game_state.guesses.append(guess)
-
-    def update_game_state(self) -> GuessResult:
-        if self.is_victory():
-            self.game_state.result = GameResult.VICTORY
+    async def get_guess_result(self) -> GuessResult:
+        if await self.game.result == GameResult.VICTORY:
             return GuessResult.GUESSED
-
-        if self.is_defeat():
-            self.game_state.result = GameResult.DEFEAT
-
         return GuessResult.NOT_GUESSED
-
-    def is_victory(self) -> bool:
-        if self.game_state.guesses == []:
-            return False
-
-        word = self.game_state.game_word
-        guess = self.game_state.guesses[-1]
-        return word == guess
-
-    def is_defeat(self) -> bool:
-        return self.game_state.guesses_left == 0
 
     @staticmethod
     def compare(guess: str, word: str) -> list[LetterStatus]:
