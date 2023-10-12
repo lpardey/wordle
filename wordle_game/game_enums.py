@@ -1,4 +1,4 @@
-from enum import Enum
+from enum import Enum, IntEnum
 
 
 class GameResult(str, Enum):
@@ -16,12 +16,12 @@ class GameStatus(str, Enum):
     FINISHED = "FINISHED"
 
 
-class GameDifficulty(int, Enum):
+class GameDifficulty(IntEnum):
     NORMAL = 0
     HARD = 1
 
 
-class LetterStatus(int, Enum):
+class LetterStatus(IntEnum):
     IN_PLACE = 0
     PRESENT = 1
     NOT_PRESENT = 2
