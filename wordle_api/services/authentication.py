@@ -11,8 +11,8 @@ class AuthException(Exception):
     pass
 
 
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(password: str, password_hash: str) -> bool:
+    return pwd_context.verify(password, password_hash)
 
 
 def get_password_hash(password: str) -> str:
@@ -21,6 +21,6 @@ def get_password_hash(password: str) -> str:
 
 async def authenticate_user(username: str, password: str) -> User:
     user = await User.get_or_none(username=username)
-    if user is None or not verify_password(password, user.password):
-        raise AuthException()
-    return user
+    if user and verify_password(password, user.password_hash):
+        return user
+    raise AuthException()

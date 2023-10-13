@@ -17,9 +17,6 @@ class Game(Model):
     creation_date = fields.DatetimeField(auto_now_add=True)
     guesses: fields.ReverseRelation["Guess"]
 
-    def __str__(self) -> str:
-        return f"Game {self.id} for user {self.user.id} created: {self.creation_date}"
-
     @property
     async def guesses_left(self) -> int:
         return self.max_attempts - await self.guesses.all().count()
