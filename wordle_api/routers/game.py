@@ -1,5 +1,7 @@
-from fastapi import HTTPException, APIRouter, status
+from typing import Annotated
+from fastapi import Depends, HTTPException, APIRouter, status
 from wordle_api.models import Game
+from wordle_api.models.user import User
 from wordle_api.pydantic_models import Game_Pydantic
 from wordle_api.schemas.game import (
     BasicStatus,
@@ -8,6 +10,7 @@ from wordle_api.schemas.game import (
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
+from wordle_api.services.authentication import get_current_active_user
 from wordle_client.game_word import AllWords, get_game_word
 from wordle_api.services.game import WordleException, WordleGame
 
@@ -16,17 +19,28 @@ from wordle_api.services.game import WordleException, WordleGame
 router = APIRouter(prefix="/game", tags=["Game"])
 
 
+async def get_game_by_id(game_id: int | None, user: User) -> Game | None:
+    if game_id:
+        game = await Game.get_or_none(id=game_id)
+    else:
+        game = await user.games.order_by("-id").first()
+    return game
+
+
 @router.get("/{game_id}", response_model=Game_Pydantic)
-# @authorized_endpoint
-async def get_game_status(game_id: int):
-    game = await Game.get_or_none(id=game_id)
+async def get_game_status(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    game_id: int | None = None,
+):
+    game = await get_game_by_id(game_id=game_id, user=current_user)
     if game is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
     return await Game_Pydantic.from_tortoise_orm(game)
 
 
 @router.post("/{user_id}")
-async def create_game(create_game_request: CreateGameRequest) -> CreateGameResponse:
+async def create_game(current_user: Annotated[User, Depends(get_current_active_user)]) -> CreateGameResponse:
+    create_game_request = CreateGameRequest(user_id=current_user.id)
     try:
         game_word = get_game_word(words_list=AllWords.words)
         game = await Game.create(
@@ -41,12 +55,16 @@ async def create_game(create_game_request: CreateGameRequest) -> CreateGameRespo
 
 
 @router.post("/{user_id}/{game_id}/guess")
-async def take_a_guess(user_id: int, game_id: int, guess_request: TakeAGuessRequest) -> TakeAGuessResponse:
-    game_query = await Game.get_or_none(id=game_id, user_id=user_id)
-    if game_query is None:
+async def take_a_guess(
+    guess_request: TakeAGuessRequest,
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    game_id: int | None = None,
+) -> TakeAGuessResponse:
+    game = await get_game_by_id(game_id=game_id, user=current_user)
+    if game is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Game not found")
     guess = guess_request.guess.upper()
-    wordle_game = WordleGame(game_query)
+    wordle_game = WordleGame(game)
     game_status = BasicStatus.OK
     message = None
     guess_result = None
