@@ -23,7 +23,7 @@ class GameConfig(BaseModel):
 
 class CreateGameRequest(BaseModel):
     user_id: int
-    game_config: GameConfig
+    game_config: GameConfig = GameConfig()
 
 
 class CreateGameResponse(BaseModel):

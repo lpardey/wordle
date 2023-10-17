@@ -9,13 +9,7 @@ from wordle_api.models import User
 
 SETTINGS = get_settings()
 
-CREDENTIALS_EXCEPTION = HTTPException(
-    status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Invalid credentials",
-    headers={"WWW-Authenticate": "Bearer"},
-)
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account/login")
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
@@ -32,7 +26,11 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
         payload = jwt.decode(token, SETTINGS.SECRET_KEY, algorithms=[SETTINGS.TOKEN_ALGORITHM])
         username = payload.get("sub")
         if username is None:
-            raise CREDENTIALS_EXCEPTION
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
     except JWTError:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something unexpected happened")
     user = await User.get_or_none(username=username)

@@ -8,6 +8,6 @@ if TYPE_CHECKING:
 
 class UserSession(Model):
     id = fields.IntField(pk=True)
-    token = fields.CharField(max_length=255)
+    access_token = fields.CharField(max_length=255)
     creation_date = fields.DatetimeField(auto_now_add=True)
     user: fields.ForeignKeyRelation["User"] = fields.ForeignKeyField("models.User", related_name="sessions")
