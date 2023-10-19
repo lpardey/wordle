@@ -1,6 +1,6 @@
 from tortoise.models import Model
 from tortoise import fields
-from wordle_game.game_enums import GameDifficulty, GameResult, GameStatus
+from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus
 from .guess import Guess
 from typing import TYPE_CHECKING
 
@@ -13,12 +13,13 @@ class Game(Model):
     user: fields.ForeignKeyRelation["User"] = fields.ForeignKeyField("models.User", related_name="games")
     game_word = fields.CharField(max_length=5)
     max_attempts = fields.SmallIntField()
-    difficulty = fields.IntEnumField(enum_type=GameDifficulty)
+    difficulty = fields.CharEnumField(enum_type=GameDifficulty)
     creation_date = fields.DatetimeField(auto_now_add=True)
     guesses: fields.ReverseRelation["Guess"]
 
     def __str__(self) -> str:
-        return f"Game {self.id} for user {self.user.id} created: {self.creation_date}"
+        return f"""Game {self.id}
+        Creation date: {self.creation_date.strftime('%B %d of %Y')}"""
 
     @property
     async def guesses_left(self) -> int:

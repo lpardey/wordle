@@ -3,9 +3,9 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
+    APP_NAME: str = "Wordlematic"
     DATABASE_URL: str = "sqlite://db.sqlite3"
     SECRET_KEY: str = "c2be1062540cd526c982764243e6ab5247fb4d638d4a4f088ce904d4fda63b45"  # openssl rand -hex 32
-    APP_NAME: str = "Wordlematic"
     REGISTRATION_TOKEN_LIFETIME: int = 120  # TODO
     ACCESS_TOKEN_LIFETIME: int = 30
     TOKEN_ALGORITHM: str = "HS256"

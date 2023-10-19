@@ -1,8 +1,8 @@
 from tortoise.contrib.fastapi import register_tortoise
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from wordle_api.routers.game_router import router as game_router
-from wordle_api.routers.user_router import router as user_router
+from wordle_api.routers.game import router as game_router
+from wordle_api.routers.user import router as user_router
 from wordle_api.config.settings import get_settings
 
 # from wordle_api.auth.asdf import router as auth_router

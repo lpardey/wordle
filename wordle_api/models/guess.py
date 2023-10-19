@@ -12,4 +12,4 @@ class Guess(Model):
     game: fields.ForeignKeyRelation["Game"] = fields.ForeignKeyField("models.Game", related_name="guesses")
 
     def __str__(self) -> str:
-        return f"Guess {self.id} for game {self.game.id}: '{self.value}'"
+        return f"Guess {self.id}: {self.value}"

@@ -1,9 +1,9 @@
 import pytest
 from unittest import mock
-from wordle_game.game_state import GameResult, GameState, GameStatus, GuessResult
-from wordle_game.game import WordleException, WordleGame
-from wordle_game.player import Player
-from wordle_game.player_statistics import PlayerStatistics
+from game.game_state import GameResult, GameState, GameStatus, GuessResult
+from game.game import WordleException, WordleGame
+from game.player import Player
+from game.player_statistics import PlayerStatistics
 
 
 @pytest.mark.parametrize(

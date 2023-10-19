@@ -1,5 +1,5 @@
 import pytest
-from wordle_game.player import Player
+from game.player import Player
 
 
 @pytest.fixture()

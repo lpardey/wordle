@@ -2,9 +2,9 @@ from unittest import mock
 from fastapi import HTTPException
 import pytest
 from wordle_api.game.router import create_game, get_game_status, take_a_guess
-from wordle_game.game import WordleGame
-from wordle_game.game_state import GameState, GameStatus, GuessResult, LetterStatus
-from wordle_game.game_storage import GameStorage
+from game.game import WordleGame
+from game.game_state import GameState, GameStatus, GuessResult, LetterStatus
+from game.game_storage import GameStorage
 from wordle_schemas.game import (
     BasicStatus,
     GameConfig,

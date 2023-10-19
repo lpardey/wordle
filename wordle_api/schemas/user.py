@@ -11,13 +11,9 @@ class SignUpResponse(BaseModel):
     user_id: int
 
 
-class LoginRequest(BaseModel):
-    username: str
-    password: SecretStr
-
-
 class LoginResponse(BaseModel):
     session_id: int
     user_id: int
-    token: str
+    access_token: str
+    token_type:str
     session_creation_date: datetime

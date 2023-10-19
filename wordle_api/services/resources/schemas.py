@@ -16,9 +16,9 @@ class GameStatus(str, Enum):
     FINISHED = "FINISHED"
 
 
-class GameDifficulty(IntEnum):
-    NORMAL = 0
-    HARD = 1
+class GameDifficulty(str, Enum):
+    NORMAL = "NORMAL"
+    HARD = "HARD"
 
 
 class LetterStatus(IntEnum):

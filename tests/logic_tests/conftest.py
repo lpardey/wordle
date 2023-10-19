@@ -1,7 +1,8 @@
 import pytest
-from wordle_game.game import WordleGame
-from wordle_game.game_state import GameState
-from wordle_game.game_storage import GameStorage
+from wordle_api.services.game import WordleGame
+from game.game_state import GameState
+from game.game_storage import GameStorage
+
 
 
 @pytest.fixture()
