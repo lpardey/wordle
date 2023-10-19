@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import Depends, HTTPException, APIRouter, status
+from fastapi import Depends, HTTPException, APIRouter, status, Query
 from wordle_api.models import Game
 from wordle_api.models.user import User
 from wordle_api.pydantic_models import Game_Pydantic
@@ -19,26 +19,7 @@ from wordle_api.services.game import WordleException, WordleGame
 router = APIRouter(prefix="/game", tags=["Game"])
 
 
-async def get_game_by_id(game_id: int | None, user: User) -> Game | None:
-    if game_id:
-        game = await Game.get_or_none(id=game_id)
-    else:
-        game = await user.games.order_by("-id").first()
-    return game
-
-
-@router.get("/{game_id}", response_model=Game_Pydantic)
-async def get_game_status(
-    current_user: Annotated[User, Depends(get_current_active_user)],
-    game_id: int | None = None,
-):
-    game = await get_game_by_id(game_id=game_id, user=current_user)
-    if game is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
-    return await Game_Pydantic.from_tortoise_orm(game)
-
-
-@router.post("/{user_id}")
+@router.post("/create")
 async def create_game(current_user: Annotated[User, Depends(get_current_active_user)]) -> CreateGameResponse:
     create_game_request = CreateGameRequest(user_id=current_user.id)
     try:
@@ -54,11 +35,22 @@ async def create_game(current_user: Annotated[User, Depends(get_current_active_u
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.post("/{user_id}/{game_id}/guess")
-async def take_a_guess(
-    guess_request: TakeAGuessRequest,
+@router.get("/status", response_model=Game_Pydantic)
+async def get_game_status(
     current_user: Annotated[User, Depends(get_current_active_user)],
-    game_id: int | None = None,
+    game_id: int | None = Query(default=None, title="Game ID", description="Optional game ID"),
+):
+    game = await get_game_by_id(game_id=game_id, user=current_user)
+    if game is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
+    return await Game_Pydantic.from_tortoise_orm(game)
+
+
+@router.post("/guess")
+async def take_a_guess(
+    current_user: Annotated[User, Depends(get_current_active_user)],
+    guess_request: TakeAGuessRequest,
+    game_id: int = Query(..., title="Game ID", description="Optional game ID"),
 ) -> TakeAGuessResponse:
     game = await get_game_by_id(game_id=game_id, user=current_user)
     if game is None:
@@ -81,3 +73,11 @@ async def take_a_guess(
         guess_result=guess_result,
         guess_letters_status=guess_letters_status,
     )
+
+
+async def get_game_by_id(game_id: int | None, user: User) -> Game | None:
+    if game_id:
+        game = await Game.get_or_none(id=game_id)
+    else:
+        game = await user.games.order_by("-id").first()
+    return game
