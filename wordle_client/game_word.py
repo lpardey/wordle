@@ -74,7 +74,7 @@ def get_words_list_from_meaningpedia() -> list[str]:
     # compile regex
     pattern = re.compile(r'<span itemprop="name">(\w+)</span>')
     # find all matches
-    words_list = pattern.findall(response.text)
+    words_list: list[str] = pattern.findall(response.text)
     parsed_words_list = [word.upper() for word in words_list]
     return parsed_words_list
 
