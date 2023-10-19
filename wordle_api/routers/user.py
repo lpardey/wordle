@@ -11,9 +11,18 @@ from wordle_api.models import User, UserSession
 router = APIRouter(prefix="/account", tags=["Account"])
 
 
-@router.get("/get", response_model=User_Pydantic)
+@router.get("/get/me", response_model=User_Pydantic)
 async def get_user(current_user: Annotated[User, Depends(get_current_active_user)]):
     return await User_Pydantic.from_tortoise_orm(current_user)
+
+
+# Admin
+@router.get("/get", response_model=User_Pydantic)
+async def get_any_user(username: str):
+    user = await User.get_or_none(username=username)
+    if user is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"User with {username=} not found")
+    return await User_Pydantic.from_tortoise_orm(user)
 
 
 @router.post("/create")
