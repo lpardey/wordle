@@ -12,3 +12,8 @@ class User(Model):
     creation_date = fields.DatetimeField(auto_now_add=True)
     games: fields.ReverseRelation["Game"]
     sessions: fields.ReverseRelation["UserSession"]
+
+    def __str__(self) -> str:
+        message = f"""User {self.id}: '{self.username}'
+        Creation date: {self.creation_date.strftime('%B %d of %Y')}"""
+        return message
