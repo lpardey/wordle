@@ -48,7 +48,7 @@ async def get_game_status(
 async def take_a_guess(
     current_user: Annotated[User, Depends(get_current_active_user)],
     guess_request: TakeAGuessRequest,
-    game_id: int = Query(..., title="Game ID", description="Optional game ID"),
+    game_id: int = Query(default=None, title="Game ID", description="Optional game ID"),
 ) -> TakeAGuessResponse:
     game = await get_game_by_id(game_id=game_id, user=current_user)
     if game is None:
