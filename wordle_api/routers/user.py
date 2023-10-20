@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
-from wordle_api.schemas.user import LoginResponse, SignUpRequest, SignUpResponse
+from wordle_api.schemas import LoginResponse, SignUpRequest, SignUpResponse
 from wordle_api.services.authentication import create_access_token, get_current_active_user
 from wordle_api.services.resources.utils import AuthException, get_password_hash, authenticate_user
 from wordle_api.pydantic_models import User_Pydantic

@@ -18,7 +18,6 @@ app.add_middleware(
 )
 app.include_router(user_router)
 app.include_router(game_router)
-# app.include_router(auth_router)
 register_tortoise(
     app,
     db_url=SETTINGS.DATABASE_URL,
