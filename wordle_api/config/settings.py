@@ -15,7 +15,6 @@ class Settings(BaseSettings):
     HOST: str = "localhost"
     PORT: int = 8000
     BASE_URL: str = f"{HOST}:{PORT}/"
-    MODELS: list[str] = ["wordle_api.models", "wordle_api.pydantic_models"]
 
     class Config:
         case_sensitive: bool = True

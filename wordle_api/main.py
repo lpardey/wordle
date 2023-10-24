@@ -6,6 +6,7 @@ from wordle_api.routers.user import router as user_router
 from wordle_api.config.settings import get_settings
 
 SETTINGS = get_settings()
+MODELS = ["wordle_api.models", "wordle_api.pydantic_models"]
 app = FastAPI(title=SETTINGS.APP_NAME)
 app.add_middleware(
     CORSMiddleware,
@@ -19,7 +20,7 @@ app.include_router(game_router)
 register_tortoise(
     app,
     db_url=SETTINGS.DATABASE_URL,
-    modules={"models": SETTINGS.MODELS},
+    modules={"models": MODELS},
     add_exception_handlers=True,
     generate_schemas=True,
 )
