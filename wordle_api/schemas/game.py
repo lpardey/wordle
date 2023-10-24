@@ -1,6 +1,7 @@
 from enum import Enum
 from pydantic import BaseModel
-from wordle_api.services.resources.schemas import GameDifficulty, GuessResult, LetterStatus
+from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus, GuessResult, LetterStatus
+from datetime import datetime
 
 # schema = transferir informacion --- esto va en la API
 # modelo = almacenar informacion --- esto va en la base de datos
@@ -19,6 +20,17 @@ class BasicResponse(BaseModel):
 class GameConfig(BaseModel):
     number_of_attempts: int = 6
     game_difficulty: GameDifficulty = GameDifficulty.NORMAL
+
+
+class GameStatusResponse(BaseModel):
+    id: int
+    _game_word: str
+    guesses_left: int
+    status: GameStatus
+    result: GameResult | None
+    difficulty: GameDifficulty
+    guesses: list[str]
+    creation_date: datetime
 
 
 class CreateGameRequest(BaseModel):
