@@ -5,7 +5,9 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from wordle_api.config.settings import get_settings
 from wordle_api.models import User
+import logging
 
+logger = logging.getLogger("Auth")
 
 SETTINGS = get_settings()
 
@@ -31,7 +33,8 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
                 detail="Invalid credentials",
                 headers={"WWW-Authenticate": "Bearer"},
             )
-    except JWTError:
+    except JWTError as e:
+        logger.exception(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something unexpected happened")
     user = await User.get_or_none(username=username)
     if user is None:
