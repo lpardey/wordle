@@ -9,7 +9,10 @@ FROM base AS development
 
 COPY requirements-dev.txt requirements-dev.txt
 RUN python -m pip install -r requirements-dev.txt
+ENV PATH="/app/scripts:$PATH"
 
+# Pocho approach directly from the terminal:
+# export PATH=$PWD/scripts:$PATH
 
 # FROM base AS production
 # COPY . /app
