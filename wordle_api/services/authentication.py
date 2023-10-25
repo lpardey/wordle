@@ -1,11 +1,16 @@
-from jose import jwt, JWTError
+# Standard Library
+import logging
 from datetime import datetime, timedelta
 from typing import Annotated
+
+# Dependencies
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
+from jose import JWTError, jwt
+
+# From apps
 from wordle_api.config.settings import get_settings
 from wordle_api.models import User
-import logging
 
 logger = logging.getLogger("Auth")
 

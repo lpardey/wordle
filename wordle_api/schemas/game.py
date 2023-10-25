@@ -1,7 +1,12 @@
-from enum import Enum
-from pydantic import BaseModel
-from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus, GuessResult, LetterStatus
+# Standard Library
 from datetime import datetime
+from enum import Enum
+
+# Dependencies
+from pydantic import BaseModel
+
+# From apps
+from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus, GuessResult, LetterStatus
 
 # schema = transferir informacion --- esto va en la API
 # modelo = almacenar informacion --- esto va en la base de datos

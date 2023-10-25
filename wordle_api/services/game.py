@@ -1,6 +1,7 @@
-from wordle_api.models import Guess, Game
+# From apps
+from wordle_api.models import Game, Guess
+from wordle_api.services.resources.schemas import GameResult, GameStatus, GuessResult, LetterStatus
 from wordle_client.game_word import AllWords
-from wordle_api.services.resources.schemas import GameResult, GameStatus, LetterStatus, GuessResult
 
 
 class WordleException(Exception):

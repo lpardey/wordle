@@ -1,5 +1,11 @@
+# Standard Library
+import logging
 from typing import Annotated
-from fastapi import Depends, HTTPException, APIRouter, Path, status
+
+# Dependencies
+from fastapi import APIRouter, Depends, HTTPException, Path, status
+
+# From apps
 from wordle_api.models import Game, User
 from wordle_api.schemas import (
     BasicStatus,
@@ -10,9 +16,8 @@ from wordle_api.schemas import (
 )
 from wordle_api.schemas.game import GameStatusResponse
 from wordle_api.services.authentication import get_current_active_user
-from wordle_client.game_word import AllWords, get_game_word
 from wordle_api.services.game import WordleException, WordleGame
-import logging
+from wordle_client.game_word import AllWords, get_game_word
 
 logger = logging.getLogger("Game")
 

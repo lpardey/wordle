@@ -1,4 +1,7 @@
+# Dependencies
 import pytest
+
+# From apps
 from wordle_api.user.models import User
 from wordle_api.user.store import UserStore, UserStoreDict
 

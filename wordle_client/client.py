@@ -1,9 +1,11 @@
+# Standard Library
 import json
 import logging
 from typing import Type, TypeVar
+
+# Dependencies
 import requests
 from requests import Response
-
 from wordle_schemas.game import (
     BasicResponse,
     BasicStatus,

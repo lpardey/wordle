@@ -1,7 +1,10 @@
-import pytest
+# Standard Library
 from unittest import mock
-from game.game_state import GameResult, GameState, GameStatus, GuessResult
+
+# Dependencies
+import pytest
 from game.game import WordleException, WordleGame
+from game.game_state import GameResult, GameState, GameStatus, GuessResult
 from game.player import Player
 from game.player_statistics import PlayerStatistics
 

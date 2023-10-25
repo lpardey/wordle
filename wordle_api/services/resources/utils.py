@@ -1,6 +1,9 @@
+# Dependencies
 from passlib.context import CryptContext
-from wordle_api.models import User
+
+# From apps
 from wordle_api.config.settings import get_settings
+from wordle_api.models import User
 
 SETTINGS = get_settings()
 

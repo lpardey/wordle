@@ -1,8 +1,12 @@
-from tortoise import fields
-from tortoise.models import Model
+# Standard Library
 from typing import TYPE_CHECKING
 
+# Dependencies
+from tortoise import fields
+from tortoise.models import Model
+
 if TYPE_CHECKING:
+    # Local imports
     from .user import User
 
 

@@ -1,3 +1,4 @@
+# Local imports
 from .game import Game
 from .guess import Guess
 from .user import User

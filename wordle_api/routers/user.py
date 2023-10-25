@@ -1,14 +1,19 @@
+# Standard Library
+import logging
 from typing import Annotated
+
+# Dependencies
 from fastapi import APIRouter, Depends, Path, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+
+# From apps
+from wordle_api.models import User, UserSession
+from wordle_api.pydantic_models import User_Pydantic
 from wordle_api.schemas import LoginResponse, SignUpRequest
 from wordle_api.schemas.user import CreateUserResponse
 from wordle_api.services.authentication import create_access_token, get_current_active_user
-from wordle_api.services.resources.utils import AuthException, get_password_hash, authenticate_user
-from wordle_api.pydantic_models import User_Pydantic
-from wordle_api.models import User, UserSession
-import logging
+from wordle_api.services.resources.utils import AuthException, authenticate_user, get_password_hash
 
 logger = logging.getLogger("User")
 

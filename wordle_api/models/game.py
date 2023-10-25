@@ -1,11 +1,19 @@
-from tortoise.models import Model
-from tortoise import fields
-from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus
-from .guess import Guess
+# Standard Library
 from datetime import datetime
 from typing import TYPE_CHECKING
 
+# Dependencies
+from tortoise import fields
+from tortoise.models import Model
+
+# From apps
+from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus
+
+# Local imports
+from .guess import Guess
+
 if TYPE_CHECKING:
+    # Local imports
     from .user import User
 
 

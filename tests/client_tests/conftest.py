@@ -1,5 +1,7 @@
+# Dependencies
 import pytest
 
+# From apps
 from wordle_client.client import WordleClient
 
 

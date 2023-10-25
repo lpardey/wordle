@@ -1,8 +1,10 @@
+# Dependencies
 import pytest
-from wordle_api.services.game import WordleGame
 from game.game_state import GameState
 from game.game_storage import GameStorage
 
+# From apps
+from wordle_api.services.game import WordleGame
 
 
 @pytest.fixture()

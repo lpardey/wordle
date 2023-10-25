@@ -1,5 +1,8 @@
-from pydantic import BaseModel, SecretStr
+# Standard Library
 from datetime import datetime
+
+# Dependencies
+from pydantic import BaseModel, SecretStr
 
 
 class SignUpRequest(BaseModel):

@@ -1,5 +1,8 @@
+# Dependencies
 from tortoise import fields
 from tortoise.models import Model
+
+# Local imports
 from .game import Game
 from .user_session import UserSession
 

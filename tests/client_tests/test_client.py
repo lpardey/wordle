@@ -1,10 +1,15 @@
-from typing import Type
+# Standard Library
 import unittest
+from typing import Type
+from unittest import mock
+
+# Dependencies
 import pytest
 from requests import Response
-from wordle_client.client import GenericResponse, WordleClient, WordleClientException
 from wordle_schemas.game import BasicResponse, BasicStatus, GameConfig, GameCreationResponse
-from unittest import mock
+
+# From apps
+from wordle_client.client import GenericResponse, WordleClient, WordleClientException
 
 
 # TODO: por revisar

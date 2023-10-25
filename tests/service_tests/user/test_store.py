@@ -1,11 +1,12 @@
+# Standard Library
 from unittest import mock
+
+# Dependencies
 import pytest
+
+# From apps
 from wordle_api.user.models import User
-from wordle_api.user.store import (
-    StoreExceptionAlreadyInUse,
-    StoreExceptionNotFound,
-    UserStoreDict,
-)
+from wordle_api.user.store import StoreExceptionAlreadyInUse, StoreExceptionNotFound, UserStoreDict
 
 
 @mock.patch.object(UserStoreDict, "get_user_by_id")

@@ -1,9 +1,12 @@
-from random import randint
-import re
-from typing import Callable
-import requests
+# Standard Library
 import logging
+import re
 from functools import partial
+from random import randint
+from typing import Callable
+
+# Dependencies
+import requests
 
 logger = logging.getLogger(__name__)
 
