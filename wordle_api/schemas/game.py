@@ -27,10 +27,11 @@ class GameStatusResponse(BaseModel):
     _game_word: str
     guesses_left: int
     status: GameStatus
-    result: GameResult | None
     difficulty: GameDifficulty
-    guesses: list[str]
     creation_date: datetime
+    guesses: list[str]
+    result: GameResult | None
+    finished_date: datetime | None
 
 
 class CreateGameRequest(BaseModel):
@@ -40,6 +41,7 @@ class CreateGameRequest(BaseModel):
 
 class CreateGameResponse(BaseModel):
     game_id: int
+    creation_date: datetime
 
 
 class TakeAGuessRequest(BaseModel):
@@ -50,4 +52,4 @@ class TakeAGuessResponse(BasicResponse):
     status: BasicStatus
     message: str | None
     guess_result: GuessResult | None
-    guess_letters_status: list[LetterStatus] | None
+    letters_status: list[LetterStatus] | None
