@@ -2,6 +2,7 @@ from tortoise.models import Model
 from tortoise import fields
 from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus
 from .guess import Guess
+from datetime import datetime
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -42,3 +43,8 @@ class Game(Model):
         if last_guess.value == self.game_word:
             return GameResult.VICTORY
         return GameResult.DEFEAT
+
+    @property
+    async def finished_date(self) -> datetime | None:
+        if await self.status == GameStatus.FINISHED:
+            return datetime.utcnow()
