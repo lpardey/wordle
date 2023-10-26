@@ -7,6 +7,8 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 
 # From apps
 from wordle_api.models import Game, User
+from wordle_api.models.guess import Guess
+from wordle_api.routers.helpers.game_helpers import get_game_by_id
 from wordle_api.schemas import (
     BasicStatus,
     CreateGameRequest,
@@ -14,7 +16,7 @@ from wordle_api.schemas import (
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
-from wordle_api.schemas.game import GameStatusResponse
+from wordle_api.schemas.game import GameState, GameStatusResponse
 from wordle_api.services.authentication import get_current_active_user
 from wordle_api.services.game import WordleException, WordleGame
 from wordle_client.game_word import AllWords, get_game_word
@@ -46,9 +48,7 @@ async def get_game_status(
     game_id: Annotated[int, Path(title="Game ID")],
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> GameStatusResponse:
-    game = await Game.get_or_none(id=game_id)
-    if game is None:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
+    game = await get_game_by_id(game_id)
     return GameStatusResponse(
         id=game.id,
         game_word=game.game_word,
@@ -68,21 +68,29 @@ async def take_a_guess(
     current_user: Annotated[User, Depends(get_current_active_user)],
     guess_request: TakeAGuessRequest,
 ) -> TakeAGuessResponse:
-    game = await Game.get_or_none(id=game_id)
-    if game is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Game not found")
-    guess = guess_request.guess.upper()
-    wordle_game = WordleGame(game)
+    game = await get_game_by_id(game_id)
+    game_state = GameState(
+        id=game_id,
+        game_word=game.game_word,
+        guess=guess_request.guess.upper(),
+        status=await game.status,
+        result=await game.result,
+    )
+    wordle_game = WordleGame(game_state)
     game_status = BasicStatus.OK
     message = None
     guess_result = None
     letters_status = None
     try:
-        guess_result = await wordle_game.guess(guess)
-        letters_status = wordle_game.compare(guess, wordle_game.game.game_word)
+        guess_result = wordle_game.guess()
+        await Guess.create(game_id=game_state.id, value=game_state.guess)
+        letters_status = wordle_game.compare()
     except WordleException as e:
         game_status = BasicStatus.ERROR
         message = str(e)
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
     return TakeAGuessResponse(
         status=game_status,
         message=message,
