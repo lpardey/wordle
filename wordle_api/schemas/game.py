@@ -8,9 +8,6 @@ from pydantic import BaseModel
 # From apps
 from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus, GuessResult, LetterStatus
 
-# schema = transferir informacion --- esto va en la API
-# modelo = almacenar informacion --- esto va en la base de datos
-
 
 class BasicStatus(str, Enum):
     OK = "OK"
@@ -37,6 +34,14 @@ class GameStatusResponse(BaseModel):
     guesses: list[str]
     result: GameResult | None
     finished_date: datetime | None
+
+
+class GameState(BaseModel):
+    id: int
+    game_word: str
+    guess: str
+    status: GameStatus
+    result: GameResult | None
 
 
 class CreateGameRequest(BaseModel):
