@@ -1,24 +1,28 @@
 # Local imports
 from .game import (
-    BasicResponse,
     BasicStatus,
+    BasicResponse,
+    GameConfig,
+    GameStatusResponse,
+    GameState,
     CreateGameRequest,
     CreateGameResponse,
-    GameConfig,
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
-from .user import LoginResponse, SignUpRequest, SignUpResponse
+from .user import CreateUserRequest, CreateUserResponse, LoginResponse
 
 __all__ = [
     "BasicStatus",
     "BasicResponse",
     "GameConfig",
+    "GameStatusResponse",
+    "GameState",
     "CreateGameRequest",
     "CreateGameResponse",
     "TakeAGuessRequest",
     "TakeAGuessResponse",
-    "SignUpRequest",
-    "SignUpResponse",
+    "CreateUserRequest",
+    "CreateUserResponse",
     "LoginResponse",
 ]

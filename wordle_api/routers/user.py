@@ -10,8 +10,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 # From apps
 from wordle_api.models import User, UserSession
 from wordle_api.pydantic_models import User_Pydantic
-from wordle_api.schemas import LoginResponse, SignUpRequest
-from wordle_api.schemas.user import CreateUserResponse
+from wordle_api.schemas import LoginResponse, CreateUserResponse, CreateUserRequest
 from wordle_api.services.authentication import create_access_token, get_current_active_user
 from wordle_api.services.resources.utils import AuthException, authenticate_user, get_password_hash
 
@@ -35,7 +34,7 @@ async def get_any_user(username: Annotated[str, Path(title="Username")]):
 
 
 @router.post("/create", status_code=status.HTTP_201_CREATED)
-async def create_user(request: SignUpRequest) -> CreateUserResponse:
+async def create_user(request: CreateUserRequest) -> CreateUserResponse:
     if await User.exists(username=request.username):
         raise HTTPException(status.HTTP_409_CONFLICT, detail="Username unavailable")
     try:

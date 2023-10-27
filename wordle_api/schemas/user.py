@@ -5,13 +5,9 @@ from datetime import datetime
 from pydantic import BaseModel, SecretStr
 
 
-class SignUpRequest(BaseModel):
+class CreateUserRequest(BaseModel):
     username: str
     password: SecretStr
-
-
-class SignUpResponse(BaseModel):
-    user_id: int
 
 
 class CreateUserResponse(BaseModel):

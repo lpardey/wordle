@@ -2,7 +2,7 @@
 from collections import Counter
 
 # From apps
-from wordle_api.schemas.game import GameState
+from wordle_api.schemas import GameState
 from wordle_api.services.resources.schemas import GameResult, GameStatus, GuessResult, LetterStatus
 from wordle_client.game_word import AllWords
 

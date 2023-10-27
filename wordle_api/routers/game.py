@@ -15,8 +15,9 @@ from wordle_api.schemas import (
     CreateGameResponse,
     TakeAGuessRequest,
     TakeAGuessResponse,
+    GameState,
+    GameStatusResponse,
 )
-from wordle_api.schemas.game import GameState, GameStatusResponse
 from wordle_api.services.authentication import get_current_active_user
 from wordle_api.services.game import WordleException, WordleGame
 from wordle_client.game_word import AllWords, get_game_word
@@ -26,7 +27,7 @@ logger = logging.getLogger("Game")
 router = APIRouter(prefix="/game", tags=["Game"])
 
 
-@router.post("/create")
+@router.post("/create", status_code=status.HTTP_201_CREATED)
 async def create_game(current_user: Annotated[User, Depends(get_current_active_user)]) -> CreateGameResponse:
     create_game_request = CreateGameRequest(user_id=current_user.id)
     try:
