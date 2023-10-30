@@ -2,6 +2,9 @@
 from tortoise import fields
 from tortoise.models import Model
 
+# From apps
+from wordle_api.services.resources.schemas import GameStatus
+
 # Local imports
 from .game import Game
 from .user_session import UserSession
@@ -20,3 +23,10 @@ class User(Model):
         message = f"""User {self.id}: '{self.username}'
         Creation date: {self.creation_date.strftime('%B %d of %Y')}"""
         return message
+
+    @property
+    async def ongoing_game(self) -> bool:
+        last_game = await self.games.all().order_by("-id").first()
+        if await last_game.status == GameStatus.WAITING_FOR_GUESS:
+            return True
+        return False
