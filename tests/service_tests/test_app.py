@@ -21,7 +21,7 @@ from tests.logic_tests.conftest import basic_game_state, basic_game_storage, bas
 from wordle_api.game.router import create_game, get_game_status, take_a_guess
 
 
-#TODO: update
+# TODO: update
 @mock.patch.object(GameStorage, "add_game_state", return_value=0)
 def test_create_game(m_add_game_state: mock.Mock):
     game_config = GameConfig()

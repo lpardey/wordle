@@ -46,7 +46,7 @@ def test_validate_guess_success(basic_wordle_game: WordleGame):
 @mock.patch.object(GameState, "status", new_callable=mock.PropertyMock)
 def test_validate_status_failure(m_game_state_status: mock.Mock, status: GameStatus, expected_result: str):
     m_game_state_status.return_value = status
-    game_state = GameState(player=Player(statistics=PlayerStatistics()),game_word="PIZZA")
+    game_state = GameState(player=Player(statistics=PlayerStatistics()), game_word="PIZZA")
     wordle = WordleGame(game_state=game_state)
     with pytest.raises(WordleException) as exc_info:
         wordle.validate_game_status()
