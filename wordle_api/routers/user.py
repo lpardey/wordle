@@ -6,11 +6,12 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, status
 from fastapi.exceptions import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
+from tortoise.exceptions import BaseORMException
 
 # From apps
 from wordle_api.models import User, UserSession
 from wordle_api.pydantic_models import User_Pydantic
-from wordle_api.schemas import LoginResponse, CreateUserResponse, CreateUserRequest
+from wordle_api.schemas import CreateUserRequest, CreateUserResponse, LoginResponse
 from wordle_api.services.authentication import create_access_token, get_current_active_user
 from wordle_api.services.resources.utils import AuthException, authenticate_user, get_password_hash
 
@@ -47,9 +48,14 @@ async def create_user(request: CreateUserRequest) -> CreateUserResponse:
             disabled=user.disabled,
             creation_date=user.creation_date,
         )
+    except BaseORMException as e:
+        detail = f"Error while querying the database: {e}"
+        logger.exception(detail)
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
     except Exception as e:
-        logger.exception(e)
-        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        detail = f"Unexpected error: {e}"
+        logger.exception(detail)
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
 
 
 @router.post("/login")
@@ -67,6 +73,11 @@ async def login_for_access_token(form_data: Annotated[OAuth2PasswordRequestForm,
         )
     except AuthException:
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="Incorrect username or password")
+    except BaseORMException as e:
+        detail = f"Error while querying the database: {e}"
+        logger.exception(detail)
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
     except Exception as e:
-        logger.exception(e)
-        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        detail = f"Unexpected error: {e}"
+        logger.exception(detail)
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
