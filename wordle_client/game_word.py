@@ -29,8 +29,6 @@ class AllWords:
 
 
 def get_words_list() -> list[str]:
-    # con esta no funcionaran los tests si no tienes internet : )
-    # return get_words_list_from_meaningpedia()
     return get_words_list_v2(ALL_WORD_SOURCES)
 
 

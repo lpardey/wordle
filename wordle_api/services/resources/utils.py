@@ -25,5 +25,5 @@ def get_password_hash(password: str) -> str:
 async def authenticate_user(username: str, password: str) -> User:
     user = await User.get_or_none(username=username)
     if user is None or not verify_password(password, user.password_hash):
-        raise AuthException()
+        raise AuthException
     return user
