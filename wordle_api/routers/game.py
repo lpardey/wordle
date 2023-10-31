@@ -4,6 +4,7 @@ from typing import Annotated
 
 # Dependencies
 from fastapi import APIRouter, Depends, HTTPException, Path, status
+from tortoise.exceptions import BaseORMException
 
 # From apps
 from wordle_api.models import Game, User
@@ -13,10 +14,11 @@ from wordle_api.schemas import (
     BasicStatus,
     CreateGameRequest,
     CreateGameResponse,
-    TakeAGuessRequest,
-    TakeAGuessResponse,
     GameState,
     GameStatusResponse,
+    OnGoingGameReponse,
+    TakeAGuessRequest,
+    TakeAGuessResponse,
 )
 from wordle_api.services.authentication import get_current_active_user
 from wordle_api.services.game import WordleException, WordleGame
@@ -39,9 +41,14 @@ async def create_game(current_user: Annotated[User, Depends(get_current_active_u
             difficulty=create_game_request.game_config.game_difficulty,
         )
         return CreateGameResponse(game_id=game.id, creation_date=game.creation_date)
+    except BaseORMException as e:
+        detail = f"Error while querying the database: {e}"
+        logger.exception(detail)
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
     except Exception as e:
+        detail = f"Unexpected error: {e}"
         logger.exception(e)
-        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
 
 
 @router.get("/status/{game_id}")
@@ -89,12 +96,34 @@ async def take_a_guess(
     except WordleException as e:
         game_status = BasicStatus.ERROR
         message = str(e)
+    except BaseORMException as e:
+        detail = f"Error while querying the database: {e}"
+        logger.exception(detail)
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
     except Exception as e:
         logger.exception(e)
-        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=e)
     return TakeAGuessResponse(
         status=game_status,
         message=message,
         guess_result=guess_result,
         letters_status=letters_status,
     )
+
+
+@router.get("/ongoing_game")
+async def get_ongoing_game(current_user: Annotated[User, Depends(get_current_active_user)]) -> OnGoingGameReponse:
+    ongoing_game = await current_user.ongoing_game
+    if ongoing_game:
+        current_game = await current_user.games.all().order_by("-id").first()
+        game_status = await get_game_status(game_id=current_game.id, current_user=current_user)
+    else:
+        game_status = None
+    return OnGoingGameReponse(ongoing_game=ongoing_game, game_status=game_status)
+
+
+# @router.get("last_game")
+# async def get_last_game(current_user: Annotated[User, Depends(get_current_active_user)]) -> LastGameResponse | None:
+#     last_game = await current_user.games.all().order_by("-id").first()
+#     if last_game:
+#         return LastGameResponse(game_id=await last_game.id, finished_date=await last_game.finished_date)
