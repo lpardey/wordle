@@ -63,3 +63,8 @@ class TakeAGuessResponse(BasicResponse):
     message: str | None
     guess_result: GuessResult | None
     letters_status: list[LetterStatus] | None
+
+
+class OnGoingGameReponse(BaseModel):
+    ongoing_game: bool
+    game_status: GameStatusResponse | None
