@@ -1,12 +1,13 @@
 # Local imports
 from .game import (
-    BasicStatus,
     BasicResponse,
-    GameConfig,
-    GameStatusResponse,
-    GameState,
+    BasicStatus,
     CreateGameRequest,
     CreateGameResponse,
+    GameConfig,
+    GameState,
+    GameStatusResponse,
+    OnGoingGameReponse,
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
@@ -22,6 +23,7 @@ __all__ = [
     "CreateGameResponse",
     "TakeAGuessRequest",
     "TakeAGuessResponse",
+    "OnGoingGameReponse",
     "CreateUserRequest",
     "CreateUserResponse",
     "LoginResponse",
