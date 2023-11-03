@@ -4,7 +4,6 @@
 		"../compose.yaml",
 		"compose.yaml"
 	],
-
 	"service": "wordle_back",
 	"workspaceFolder": "/app",
 	"customizations": {
@@ -18,7 +17,8 @@
 				"isort.check": true,
 				"python.testing.pytestEnabled": true,
 				"python.testing.pytestArgs": [
-					"tests"
+					"tests",
+					"--color=yes"
 				],
 				"python.formatting.blackArgs": [
 					"--line-length",
