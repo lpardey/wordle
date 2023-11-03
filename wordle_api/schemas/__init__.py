@@ -10,6 +10,7 @@ from .game import (
     OnGoingGameReponse,
     TakeAGuessRequest,
     TakeAGuessResponse,
+    LastGameResponse,
 )
 from .user import CreateUserRequest, CreateUserResponse, LoginResponse
 
@@ -24,6 +25,7 @@ __all__ = [
     "TakeAGuessRequest",
     "TakeAGuessResponse",
     "OnGoingGameReponse",
+    "LastGameResponse",
     "CreateUserRequest",
     "CreateUserResponse",
     "LoginResponse",

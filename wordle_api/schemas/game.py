@@ -68,3 +68,8 @@ class TakeAGuessResponse(BasicResponse):
 class OnGoingGameReponse(BaseModel):
     ongoing_game: bool
     game_status: GameStatusResponse | None
+
+class LastGameResponse(BaseModel):
+    game_id:int
+    game_word: str
+    finished_date: datetime| None
