@@ -27,6 +27,6 @@ class User(Model):
     @property
     async def ongoing_game(self) -> bool:
         last_game = await self.games.all().order_by("-id").first()
-        if await last_game.status == GameStatus.WAITING_FOR_GUESS:
+        if last_game and await last_game.status == GameStatus.WAITING_FOR_GUESS:
             return True
         return False
