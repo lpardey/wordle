@@ -7,10 +7,10 @@ from .game import (
     GameConfig,
     GameState,
     GameStatusResponse,
+    LastGameResponse,
     OnGoingGameReponse,
     TakeAGuessRequest,
     TakeAGuessResponse,
-    LastGameResponse,
 )
 from .user import CreateUserRequest, CreateUserResponse, LoginResponse
 

@@ -1,15 +1,22 @@
 # Dependencies
 import pytest
-from game.game_state import GameState
-from game.game_storage import GameStorage
+from wordle_api.schemas.game import GameState
 
 # From apps
 from wordle_api.services.game import WordleGame
+from wordle_api.services.resources.schemas import GameStatus
+
+from enum import IntEnum
+class State(IntEnum):
+    ONGOING_GAME = 0
+    FINISHED_GAME = 1
+    NO_GAME = 2
+
 
 
 @pytest.fixture()
 def basic_game_state() -> GameState:
-    game_state = GameState(game_word="PIZZA")
+    game_state = GameState(id=1, game_word="PIZZA", guess="CLOUD", status=GameStatus.WAITING_FOR_GUESS, result=None)
     return game_state
 
 

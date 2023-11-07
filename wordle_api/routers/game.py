@@ -7,7 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 from tortoise.exceptions import BaseORMException
 
 # From apps
-from wordle_api.models import Game, User, Guess
+from wordle_api.models import Game, Guess, User
 from wordle_api.routers.helpers.game_helpers import get_game_by_id
 from wordle_api.schemas import (
     BasicStatus,
@@ -15,14 +15,14 @@ from wordle_api.schemas import (
     CreateGameResponse,
     GameState,
     GameStatusResponse,
+    LastGameResponse,
     OnGoingGameReponse,
     TakeAGuessRequest,
     TakeAGuessResponse,
-    LastGameResponse,
 )
 from wordle_api.services.authentication import get_current_active_user
 from wordle_api.services.game import WordleException, WordleGame
-from wordle_client.game_word import AllWords, get_game_word
+from wordle_api.services.resources.game_word import AllWords, get_game_word
 
 logger = logging.getLogger("Game")
 
@@ -112,7 +112,9 @@ async def take_a_guess(
 
 
 @router.get("/ongoing_game")
-async def get_ongoing_game_status(current_user: Annotated[User, Depends(get_current_active_user)]) -> OnGoingGameReponse:
+async def get_ongoing_game_status(
+    current_user: Annotated[User, Depends(get_current_active_user)]
+) -> OnGoingGameReponse:
     game = await current_user.games.all().order_by("-id").first()
     ongoing_game = await current_user.ongoing_game
     if game is None:
@@ -129,7 +131,9 @@ async def get_last_game(current_user: Annotated[User, Depends(get_current_active
     except BaseORMException as e:
         detail = f"Error while querying the database: {e}"
         logger.exception(detail)
-        
+
     if last_game:
-        return LastGameResponse(game_id= last_game.id, game_word= last_game.game_word, finished_date= await last_game.finished_date)
+        return LastGameResponse(
+            game_id=last_game.id, game_word=last_game.game_word, finished_date=await last_game.finished_date
+        )
     raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
