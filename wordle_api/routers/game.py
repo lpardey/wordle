@@ -112,13 +112,13 @@ async def take_a_guess(
 
 
 @router.get("/ongoing_game")
-async def get_ongoing_game(current_user: Annotated[User, Depends(get_current_active_user)]) -> OnGoingGameReponse:
+async def get_ongoing_game_status(current_user: Annotated[User, Depends(get_current_active_user)]) -> OnGoingGameReponse:
+    game = await current_user.games.all().order_by("-id").first()
     ongoing_game = await current_user.ongoing_game
-    if ongoing_game:
-        current_game = await current_user.games.all().order_by("-id").first()
-        game_status = await get_game_status(game_id=current_game.id, current_user=current_user)
-    else:
+    if game is None:
         game_status = None
+    else:
+        game_status = await get_game_status(game_id=game.id, current_user=current_user)
     return OnGoingGameReponse(ongoing_game=ongoing_game, game_status=game_status)
 
 
