@@ -2,9 +2,9 @@
 from collections import Counter
 
 # From apps
-from wordle_api.schemas import GameState
-from wordle_api.services.resources.game_word import AllWords
-from wordle_api.services.resources.schemas import GameResult, GameStatus, GuessResult, LetterStatus
+from api.schemas import GameState
+from api.services.resources.game_word import AllWords
+from api.services.resources.schemas import GameResult, GameStatus, GuessResult, LetterStatus
 
 
 class WordleException(Exception):
@@ -35,7 +35,7 @@ class WordleGame:
             raise WordleException(f"Invalid guess: '{guess}' is not a word.")
 
     def get_guess_result(self) -> GuessResult:
-        if self.game_state.result == GameResult.VICTORY:
+        if self.game_state.game_word == self.game_state.guess:
             return GuessResult.GUESSED
         return GuessResult.NOT_GUESSED
 
