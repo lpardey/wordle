@@ -4,12 +4,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 
 # From apps
-from wordle_api.config.settings import get_settings
-from wordle_api.routers.game import router as game_router
-from wordle_api.routers.user import router as user_router
+from api.routers.game import router as game_router
+from api.routers.user import router as user_router
+from core.settings import get_settings
 
 SETTINGS = get_settings()
-MODELS = ["wordle_api.models", "wordle_api.pydantic_models"]
+MODELS = ["api.models", "api.pydantic_models"]
 app = FastAPI(title=SETTINGS.APP_NAME)
 app.add_middleware(
     CORSMiddleware,

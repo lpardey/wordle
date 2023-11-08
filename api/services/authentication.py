@@ -9,8 +9,8 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
 # From apps
-from wordle_api.config.settings import get_settings
-from wordle_api.models import User
+from api.models import User
+from core.settings import get_settings
 
 logger = logging.getLogger("Auth")
 

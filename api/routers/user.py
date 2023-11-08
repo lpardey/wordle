@@ -9,11 +9,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from tortoise.exceptions import BaseORMException
 
 # From apps
-from wordle_api.models import User, UserSession
-from wordle_api.pydantic_models import User_Pydantic
-from wordle_api.schemas import CreateUserRequest, CreateUserResponse, LoginResponse
-from wordle_api.services.authentication import create_access_token, get_current_active_user
-from wordle_api.services.resources.utils import AuthException, authenticate_user, get_password_hash
+from api.models import User, UserSession
+from api.pydantic_models import User_Pydantic
+from api.schemas import CreateUserRequest, CreateUserResponse, LoginResponse
+from api.services.authentication import create_access_token, get_current_active_user
+from api.services.resources.utils import AuthException, authenticate_user, get_password_hash
 
 logger = logging.getLogger("User")
 

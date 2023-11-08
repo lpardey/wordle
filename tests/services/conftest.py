@@ -5,9 +5,9 @@ from enum import IntEnum
 import pytest
 
 # From apps
-from wordle_api.schemas.game import GameState
-from wordle_api.services.game import WordleGame
-from wordle_api.services.resources.schemas import GameResult, GameStatus
+from api.schemas.game import GameState
+from api.services.game import WordleGame
+from api.services.resources.schemas import GameResult, GameStatus
 
 
 class State(IntEnum):

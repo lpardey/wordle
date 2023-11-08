@@ -2,8 +2,8 @@
 from tortoise import Tortoise, run_async
 
 # From apps
-from wordle_api.config.settings import get_settings
-from wordle_api.main import MODELS
+from api.main import MODELS
+from core.settings import get_settings
 
 SETTINGS = get_settings()
 

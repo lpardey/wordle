@@ -1,2 +1,2 @@
 #!/bin/bash
-python -m wordle_api.database.purge_db
+python -m api.database.purge_db

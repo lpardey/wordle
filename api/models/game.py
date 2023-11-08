@@ -7,7 +7,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 # From apps
-from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus
+from api.services.resources.schemas import GameDifficulty, GameResult, GameStatus
 
 # Local imports
 from .guess import Guess
@@ -32,27 +32,36 @@ class Game(Model):
 
     @property
     async def guesses_left(self) -> int:
-        return self.max_attempts - await self.guesses.all().count()
+        guesses = await self.guesses.all().count()
+        return self.max_attempts - guesses
 
     @property
     async def status(self) -> GameStatus:
-        if await self.guesses_left > 0 and await self.result != GameResult.VICTORY:
+        guesses_left = await self.guesses_left
+        game_result = await self.result
+
+        if guesses_left > 0 and game_result != GameResult.VICTORY:
             return GameStatus.WAITING_FOR_GUESS
+
         return GameStatus.FINISHED
 
     @property
     async def result(self) -> GameResult | None:
         guesses_left = await self.guesses_left
         last_guess = await self.guesses.all().order_by("-id").first()
+
         if last_guess is None:
             return None
         if guesses_left > 0 and last_guess.value != self.game_word:
             return None
         if last_guess.value == self.game_word:
             return GameResult.VICTORY
+
         return GameResult.DEFEAT
 
     @property
     async def finished_date(self) -> datetime | None:
-        if await self.status == GameStatus.FINISHED:
+        game_status = await self.status
+
+        if game_status == GameStatus.FINISHED:
             return datetime.utcnow()

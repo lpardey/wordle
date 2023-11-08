@@ -3,7 +3,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 # From apps
-from wordle_api.services.resources.schemas import GameStatus
+from api.services.resources.schemas import GameStatus
 
 # Local imports
 from .game import Game
@@ -27,6 +27,9 @@ class User(Model):
     @property
     async def ongoing_game(self) -> bool:
         last_game = await self.games.all().order_by("-id").first()
-        if last_game and await last_game.status == GameStatus.WAITING_FOR_GUESS:
+        last_game_status = await last_game.status
+
+        if last_game and last_game_status == GameStatus.WAITING_FOR_GUESS:
             return True
+
         return False

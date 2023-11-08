@@ -6,7 +6,7 @@ from enum import Enum
 from pydantic import BaseModel
 
 # From apps
-from wordle_api.services.resources.schemas import GameDifficulty, GameResult, GameStatus, GuessResult, LetterStatus
+from api.services.resources.schemas import GameDifficulty, GameResult, GameStatus, GuessResult, LetterStatus
 
 
 class BasicStatus(str, Enum):
