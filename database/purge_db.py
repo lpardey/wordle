@@ -2,8 +2,8 @@
 from tortoise import Tortoise, run_async
 
 # From apps
-from api.main import MODELS
-from core.settings import get_settings
+from api.v1.main import MODELS
+from api.v1.settings import get_settings
 
 SETTINGS = get_settings()
 

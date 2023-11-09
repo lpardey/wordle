@@ -7,10 +7,10 @@ from typing import Annotated
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
+from api.v1.settings import get_settings
 
 # From apps
 from api.v1.models import User
-from core.settings import get_settings
 
 logger = logging.getLogger("Auth")
 

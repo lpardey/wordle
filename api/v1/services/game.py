@@ -4,7 +4,7 @@ from collections import Counter
 # From apps
 from api.v1.schemas import GameState
 from api.v1.services.resources.game_word import AllWords
-from api.v1.services.resources.schemas import GameResult, GameStatus, GuessResult, LetterStatus
+from api.v1.services.resources.schemas import GameStatus, GuessResult, LetterStatus
 
 
 class WordleException(Exception):

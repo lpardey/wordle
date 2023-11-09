@@ -1,2 +1,2 @@
 #!/bin/bash
-python -m api.v1.database.purge_db
+python -m database.purge_db
