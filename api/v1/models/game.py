@@ -7,7 +7,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 # From apps
-from api.services.resources.schemas import GameDifficulty, GameResult, GameStatus
+from api.v1.services.resources.schemas import GameDifficulty, GameResult, GameStatus
 
 # Local imports
 from .guess import Guess

@@ -4,7 +4,7 @@ from fastapi.exceptions import HTTPException
 from tortoise.exceptions import BaseORMException
 
 # From apps
-from api.models.game import Game
+from api.v1.models.game import Game
 
 
 async def get_game_by_id(game_id: int) -> Game:

@@ -9,11 +9,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from tortoise.exceptions import BaseORMException
 
 # From apps
-from api.models import User, UserSession
-from api.pydantic_models import User_Pydantic
-from api.schemas import CreateUserRequest, CreateUserResponse, LoginResponse
-from api.services.authentication import create_access_token, get_current_active_user
-from api.services.resources.utils import AuthException, authenticate_user, get_password_hash
+from api.v1.models import User, UserSession
+from api.v1.pydantic_models import User_Pydantic
+from api.v1.schemas import CreateUserRequest, CreateUserResponse, LoginResponse
+from api.v1.services.authentication import create_access_token, get_current_active_user
+from api.v1.services.resources.utils import AuthException, authenticate_user, get_password_hash
 
 logger = logging.getLogger("User")
 

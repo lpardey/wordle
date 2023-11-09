@@ -3,7 +3,7 @@ from tortoise import fields
 from tortoise.models import Model
 
 # From apps
-from api.services.resources.schemas import GameStatus
+from api.v1.services.resources.schemas import GameStatus
 
 # Local imports
 from .game import Game

@@ -2,7 +2,7 @@
 from passlib.context import CryptContext
 
 # From apps
-from api.models import User
+from api.v1.models import User
 from core.settings import get_settings
 
 SETTINGS = get_settings()

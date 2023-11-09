@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt
 
 # From apps
-from api.models import User
+from api.v1.models import User
 from core.settings import get_settings
 
 logger = logging.getLogger("Auth")

@@ -7,9 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 from tortoise.exceptions import BaseORMException
 
 # From apps
-from api.models import Game, Guess, User
-from api.routers.helpers.game_helpers import get_game_by_id
-from api.schemas import (
+from api.v1.models import Game, Guess, User
+from api.v1.routers.helpers.game_helpers import get_game_by_id
+from api.v1.schemas import (
     BasicStatus,
     CreateGameRequest,
     CreateGameResponse,
@@ -20,9 +20,9 @@ from api.schemas import (
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
-from api.services.authentication import get_current_active_user
-from api.services.game import WordleException, WordleGame
-from api.services.resources.game_word import AllWords, get_game_word
+from api.v1.services.authentication import get_current_active_user
+from api.v1.services.game import WordleException, WordleGame
+from api.v1.services.resources.game_word import AllWords, get_game_word
 
 logger = logging.getLogger("Game")
 
