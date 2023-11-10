@@ -9,7 +9,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from tortoise.exceptions import BaseORMException
 
 # From apps
-from api.v1.core import User_Pydantic
+from api.shared.v1.pydantic_models import User_Pydantic
 from api.v1.game.services.authentication import create_access_token, get_current_active_user
 from api.v1.game.services.resources.utils import AuthException, authenticate_user, get_password_hash
 from api.v1.user.models import User, UserSession
