@@ -1,13 +1,20 @@
+# Standard Library
+from typing import TYPE_CHECKING
+
 # Dependencies
 from tortoise import fields
 from tortoise.models import Model
 
 # From apps
-from api.v1.services.resources.schemas import GameStatus
+# from api.v1.game.models import Game
+from api.v1.game.services.resources.schemas import GameStatus
 
-# Local imports
-from .game import Game
-from .user_session import UserSession
+if TYPE_CHECKING:
+    # From apps
+    from api.v1.game.models import Game
+
+    # Local imports
+    from . import UserSession
 
 
 class User(Model):

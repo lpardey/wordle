@@ -7,14 +7,14 @@ from tortoise import fields
 from tortoise.models import Model
 
 # From apps
-from api.v1.services.resources.schemas import GameDifficulty, GameResult, GameStatus
-
-# Local imports
-from .guess import Guess
+from api.v1.game.services.resources.schemas import GameDifficulty, GameResult, GameStatus
 
 if TYPE_CHECKING:
+    # From apps
+    from api.v1.user.models import User
+
     # Local imports
-    from .user import User
+    from . import Guess
 
 
 class Game(Model):

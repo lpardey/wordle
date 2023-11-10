@@ -6,8 +6,8 @@ from tortoise import fields
 from tortoise.models import Model
 
 if TYPE_CHECKING:
-    # Local imports
-    from .user import User
+    # From apps
+    from api.v1.user.models import User
 
 
 class UserSession(Model):

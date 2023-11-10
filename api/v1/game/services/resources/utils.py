@@ -1,9 +1,9 @@
 # Dependencies
 from passlib.context import CryptContext
-from api.v1.settings import get_settings
 
 # From apps
-from api.v1.models import User
+from api.v1.settings import get_settings
+from api.v1.user.models import User
 
 SETTINGS = get_settings()
 

@@ -7,9 +7,9 @@ from fastapi import APIRouter, Depends, HTTPException, Path, status
 from tortoise.exceptions import BaseORMException
 
 # From apps
-from api.v1.models import Game, Guess, User
-from api.v1.routers.helpers.game_helpers import get_game_by_id
-from api.v1.schemas import (
+from api.v1.game.models import Game, Guess
+from api.v1.game.routers.helpers.game_helpers import get_game_by_id
+from api.v1.game.schemas.game import (
     BasicStatus,
     CreateGameRequest,
     CreateGameResponse,
@@ -20,9 +20,10 @@ from api.v1.schemas import (
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
-from api.v1.services.authentication import get_current_active_user
-from api.v1.services.game import WordleException, WordleGame
-from api.v1.services.resources.game_word import AllWords, get_game_word
+from api.v1.game.services.authentication import get_current_active_user
+from api.v1.game.services.game import WordleException, WordleGame
+from api.v1.game.services.resources.game_word import AllWords, get_game_word
+from api.v1.user.models import User
 
 logger = logging.getLogger("Game")
 
@@ -131,9 +132,10 @@ async def get_last_game(current_user: Annotated[User, Depends(get_current_active
     except BaseORMException as e:
         detail = f"Error while querying the database: {e}"
         logger.exception(detail)
-
     if last_game:
         return LastGameResponse(
-            game_id=last_game.id, game_word=last_game.game_word, finished_date=await last_game.finished_date
+            game_id=last_game.id,
+            game_word=last_game.game_word,
+            finished_date=await last_game.finished_date,
         )
     raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
