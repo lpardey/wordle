@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class User(Model):
-    id = fields.IntField(pk=True)
+    id = fields.UUIDField(pk=True)
     username = fields.CharField(max_length=50, unique=True)
     password_hash = fields.CharField(max_length=100)
     disabled = fields.BooleanField(default=False)
@@ -30,13 +30,3 @@ class User(Model):
         message = f"""User {self.id}: '{self.username}'
         Creation date: {self.creation_date.strftime('%B %d of %Y')}"""
         return message
-
-    @property
-    async def ongoing_game(self) -> bool:
-        last_game = await self.games.all().order_by("-id").first()
-        last_game_status = await last_game.status
-
-        if last_game and last_game_status == GameStatus.WAITING_FOR_GUESS:
-            return True
-
-        return False
