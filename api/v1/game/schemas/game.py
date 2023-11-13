@@ -1,6 +1,8 @@
 # Standard Library
 from datetime import datetime
 from enum import Enum
+from typing import TypedDict
+from uuid import UUID
 
 # Dependencies
 from pydantic import BaseModel
@@ -24,20 +26,26 @@ class GameConfig(BaseModel):
     game_difficulty: GameDifficulty = GameDifficulty.NORMAL
 
 
+class GuessSchema(TypedDict):
+    guess: str
+    letters_status: list[LetterStatus]
+
+
 class GameStatusResponse(BaseModel):
-    id: int
+    id: UUID
     _game_word: str
     guesses_left: int
     status: GameStatus
     difficulty: GameDifficulty
     creation_date: datetime
-    guesses: list[str]
+    guesses: list[GuessSchema]
     result: GameResult | None
+    ongoing: bool
     finished_date: datetime | None
 
 
 class GameState(BaseModel):
-    id: int
+    id: UUID
     game_word: str
     guess: str
     status: GameStatus
@@ -45,12 +53,12 @@ class GameState(BaseModel):
 
 
 class CreateGameRequest(BaseModel):
-    user_id: int
+    user_id: UUID
     game_config: GameConfig = GameConfig()
 
 
 class CreateGameResponse(BaseModel):
-    game_id: int
+    game_id: UUID
     creation_date: datetime
 
 
@@ -65,12 +73,8 @@ class TakeAGuessResponse(BasicResponse):
     letters_status: list[LetterStatus] | None
 
 
-class OnGoingGameReponse(BaseModel):
-    ongoing_game: bool
-    game_status: GameStatusResponse | None
-
-
 class LastGameResponse(BaseModel):
-    game_id: int
+    game_id: UUID
     game_word: str
+    ongoing: bool
     finished_date: datetime | None
