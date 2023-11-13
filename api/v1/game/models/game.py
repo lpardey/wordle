@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 
 
 class Game(Model):
-    id = fields.IntField(pk=True)
+    id = fields.UUIDField(pk=True)
     user: fields.ForeignKeyRelation["User"] = fields.ForeignKeyField("models.User", related_name="games")
     game_word = fields.CharField(max_length=5)
     max_attempts = fields.SmallIntField()
@@ -32,8 +32,21 @@ class Game(Model):
 
     @property
     async def guesses_left(self) -> int:
-        guesses = await self.guesses.all().count()
-        return self.max_attempts - guesses
+        return self.max_attempts - await self.guesses.all().count()
+
+    @property
+    async def result(self) -> GameResult | None:
+        guesses_left = await self.guesses_left
+        last_guess = await self.guesses.all().order_by("-id").only("value").first()
+
+        if last_guess is None:
+            return None
+        if guesses_left > 0 and last_guess.value["guess"] != self.game_word:
+            return None
+        if last_guess.value["guess"] == self.game_word:
+            return GameResult.VICTORY
+
+        return GameResult.DEFEAT
 
     @property
     async def status(self) -> GameStatus:
@@ -46,22 +59,13 @@ class Game(Model):
         return GameStatus.FINISHED
 
     @property
-    async def result(self) -> GameResult | None:
-        guesses_left = await self.guesses_left
-        last_guess = await self.guesses.all().order_by("-id").first()
-
-        if last_guess is None:
-            return None
-        if guesses_left > 0 and last_guess.value != self.game_word:
-            return None
-        if last_guess.value == self.game_word:
-            return GameResult.VICTORY
-
-        return GameResult.DEFEAT
-
-    @property
     async def finished_date(self) -> datetime | None:
         game_status = await self.status
 
         if game_status == GameStatus.FINISHED:
             return datetime.utcnow()
+
+    @property
+    async def ongoing(self) -> bool:
+        game_status = await self.status
+        return game_status == GameStatus.WAITING_FOR_GUESS
