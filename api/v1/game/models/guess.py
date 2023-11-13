@@ -11,8 +11,8 @@ if TYPE_CHECKING:
 
 
 class Guess(Model):
-    id = fields.IntField(pk=True)
-    value = fields.CharField(max_length=5)
+    id = fields.UUIDField(pk=True)
+    value = fields.JSONField()
     game: fields.ForeignKeyRelation["Game"] = fields.ForeignKeyField("models.Game", related_name="guesses")
 
     def __str__(self) -> str:
