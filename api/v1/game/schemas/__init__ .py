@@ -7,8 +7,8 @@ from .game import (
     GameConfig,
     GameState,
     GameStatusResponse,
+    GuessSchema,
     LastGameResponse,
-    OnGoingGameReponse,
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
@@ -22,7 +22,7 @@ __all__ = [
     "GameState",
     "GameStatusResponse",
     "LastGameResponse",
-    "OnGoingGameReponse",
+    "GuessSchema",
     "TakeAGuessRequest",
     "TakeAGuessResponse",
 ]
