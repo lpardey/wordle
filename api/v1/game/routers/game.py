@@ -1,6 +1,7 @@
 # Standard Library
 import logging
 from typing import Annotated
+from uuid import UUID
 
 # Dependencies
 from fastapi import APIRouter, Depends, HTTPException, Path, status
@@ -15,8 +16,8 @@ from api.v1.game.schemas.game import (
     CreateGameResponse,
     GameState,
     GameStatusResponse,
+    GuessSchema,
     LastGameResponse,
-    OnGoingGameReponse,
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
@@ -54,7 +55,7 @@ async def create_game(current_user: Annotated[User, Depends(get_current_active_u
 
 @router.get("/status/{game_id}")
 async def get_game_status(
-    game_id: Annotated[int, Path(title="Game ID")],
+    game_id: Annotated[UUID, Path(title="Game ID")],
     current_user: Annotated[User, Depends(get_current_active_user)],
 ) -> GameStatusResponse:
     game = await get_game_by_id(game_id)
@@ -67,13 +68,14 @@ async def get_game_status(
         creation_date=game.creation_date,
         guesses=await game.guesses.all().values_list("value", flat=True),
         result=await game.result,
+        ongoing=await game.ongoing,
         finished_date=await game.finished_date,
     )
 
 
 @router.post("/guess/{game_id}")
 async def take_a_guess(
-    game_id: Annotated[int, Path(title="Game ID")],
+    game_id: Annotated[UUID, Path(title="Game ID")],
     current_user: Annotated[User, Depends(get_current_active_user)],
     guess_request: TakeAGuessRequest,
 ) -> TakeAGuessResponse:
@@ -92,8 +94,9 @@ async def take_a_guess(
     letters_status = None
     try:
         guess_result = wordle_game.guess()
-        await Guess.create(game_id=game_state.id, value=game_state.guess)
         letters_status = wordle_game.compare()
+        guess_data = {"guess": game_state.guess, "letters_status": letters_status}
+        await Guess.create(game_id=game_state.id, value=GuessSchema(**guess_data))
     except WordleException as e:
         game_status = BasicStatus.ERROR
         message = str(e)
@@ -112,19 +115,6 @@ async def take_a_guess(
     )
 
 
-@router.get("/ongoing_game")
-async def get_ongoing_game_status(
-    current_user: Annotated[User, Depends(get_current_active_user)]
-) -> OnGoingGameReponse:
-    game = await current_user.games.all().order_by("-id").first()
-    ongoing_game = await current_user.ongoing_game
-    if game is None:
-        game_status = None
-    else:
-        game_status = await get_game_status(game_id=game.id, current_user=current_user)
-    return OnGoingGameReponse(ongoing_game=ongoing_game, game_status=game_status)
-
-
 @router.get("/last_game")
 async def get_last_game(current_user: Annotated[User, Depends(get_current_active_user)]) -> LastGameResponse:
     try:
@@ -136,6 +126,7 @@ async def get_last_game(current_user: Annotated[User, Depends(get_current_active
         return LastGameResponse(
             game_id=last_game.id,
             game_word=last_game.game_word,
+            ongoing=await last_game.ongoing,
             finished_date=await last_game.finished_date,
         )
     raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
