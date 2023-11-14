@@ -37,7 +37,7 @@ class Game(Model):
     @property
     async def result(self) -> GameResult | None:
         guesses_left = await self.guesses_left
-        last_guess = await self.guesses.all().order_by("-id").only("value").first()
+        last_guess = await self.guesses.all().order_by("-id").first()
 
         if last_guess is None:
             return None
