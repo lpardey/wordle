@@ -26,7 +26,7 @@ class GameConfig(BaseModel):
     game_difficulty: GameDifficulty = GameDifficulty.NORMAL
 
 
-class GuessSchema(TypedDict):
+class GuessValue(TypedDict):
     guess: str
     letters_status: list[LetterStatus]
 
@@ -37,7 +37,7 @@ class GameStatusResponse(BaseModel):
     guesses_left: int
     difficulty: GameDifficulty
     creation_date: datetime
-    guesses: list[GuessSchema]
+    guesses: list[GuessValue]
     result: GameResult | None
     status: GameStatus
     finished_date: datetime | None

@@ -16,7 +16,7 @@ from api.v1.game.schemas.game import (
     CreateGameResponse,
     GameState,
     GameStatusResponse,
-    GuessSchema,
+    GuessValue,
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
@@ -52,6 +52,13 @@ async def create_game(current_user: Annotated[User, Depends(get_current_active_u
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, detail=detail)
 
 
+@router.get("/status/last_game")
+async def get_last_game_status(current_user: Annotated[User, Depends(get_current_active_user)]) -> GameStatusResponse:
+    last_game = await current_user.games.all().order_by("-id").first()
+    game_status = await get_game_status(last_game.id, current_user)
+    return game_status
+
+
 @router.get("/status/{game_id}")
 async def get_game_status(
     game_id: Annotated[UUID, Path(title="Game ID")],
@@ -69,28 +76,6 @@ async def get_game_status(
         status=await game.status,
         finished_date=await game.finished_date,
     )
-
-
-@router.get("status/last_game")
-async def get_last_game_status(current_user: Annotated[User, Depends(get_current_active_user)]) -> GameStatusResponse:
-    try:
-        last_game = await current_user.games.all().order_by("-id").first()
-    except BaseORMException as e:
-        detail = f"Error while querying the database: {e}"
-        logger.exception(detail)
-    if last_game:
-        return GameStatusResponse(
-            id=last_game.id,
-            game_word=last_game.game_word,
-            guesses_left=await last_game.guesses_left,
-            difficulty=last_game.difficulty,
-            creation_date=last_game.creation_date,
-            guesses=await last_game.guesses.all().values_list("value", flat=True),
-            result=await last_game.result,
-            status=await last_game.status,
-            finished_date=await last_game.finished_date,
-        )
-    raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
 
 
 @router.post("/guess/{game_id}")
@@ -116,7 +101,7 @@ async def take_a_guess(
         guess_result = wordle_game.guess()
         letters_status = wordle_game.compare()
         guess_data = {"guess": game_state.guess, "letters_status": letters_status}
-        await Guess.create(game_id=game_state.id, value=GuessSchema(**guess_data))
+        await Guess.create(game_id=game_state.id, value=GuessValue(**guess_data))
     except WordleException as e:
         game_status = BasicStatus.ERROR
         message = str(e)

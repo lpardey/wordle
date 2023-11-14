@@ -25,7 +25,6 @@ async def get_user(current_user: Annotated[User, Depends(get_current_active_user
     return await User_Pydantic.from_tortoise_orm(current_user)
 
 
-# Admin
 @router.get("/{username}", response_model=User_Pydantic)
 async def get_any_user(username: Annotated[str, Path(title="Username")]):
     user = await User.get_or_none(username=username)
