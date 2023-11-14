@@ -70,10 +70,3 @@ class TakeAGuessResponse(BasicResponse):
     message: str | None
     guess_result: GuessResult | None
     letters_status: list[LetterStatus] | None
-
-
-class LastGameResponse(BaseModel):
-    game_id: UUID
-    game_word: str
-    status: GameStatus
-    finished_date: datetime | None

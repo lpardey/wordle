@@ -17,7 +17,6 @@ from api.v1.game.schemas.game import (
     GameState,
     GameStatusResponse,
     GuessSchema,
-    LastGameResponse,
     TakeAGuessRequest,
     TakeAGuessResponse,
 )
@@ -72,6 +71,28 @@ async def get_game_status(
     )
 
 
+@router.get("status/last_game")
+async def get_last_game_status(current_user: Annotated[User, Depends(get_current_active_user)]) -> GameStatusResponse:
+    try:
+        last_game = await current_user.games.all().order_by("-id").first()
+    except BaseORMException as e:
+        detail = f"Error while querying the database: {e}"
+        logger.exception(detail)
+    if last_game:
+        return GameStatusResponse(
+            id=last_game.id,
+            game_word=last_game.game_word,
+            guesses_left=await last_game.guesses_left,
+            difficulty=last_game.difficulty,
+            creation_date=last_game.creation_date,
+            guesses=await last_game.guesses.all().values_list("value", flat=True),
+            result=await last_game.result,
+            status=await last_game.status,
+            finished_date=await last_game.finished_date,
+        )
+    raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
+
+
 @router.post("/guess/{game_id}")
 async def take_a_guess(
     game_id: Annotated[UUID, Path(title="Game ID")],
@@ -112,20 +133,3 @@ async def take_a_guess(
         guess_result=guess_result,
         letters_status=letters_status,
     )
-
-
-@router.get("/last_game")
-async def get_last_game(current_user: Annotated[User, Depends(get_current_active_user)]) -> LastGameResponse:
-    try:
-        last_game = await current_user.games.all().order_by("-id").first()
-    except BaseORMException as e:
-        detail = f"Error while querying the database: {e}"
-        logger.exception(detail)
-    if last_game:
-        return LastGameResponse(
-            game_id=last_game.id,
-            game_word=last_game.game_word,
-            status=await last_game.status,
-            finished_date=await last_game.finished_date,
-        )
-    raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
