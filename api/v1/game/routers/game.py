@@ -63,11 +63,11 @@ async def get_game_status(
         id=game.id,
         game_word=game.game_word,
         guesses_left=await game.guesses_left,
-        status=await game.status,
         difficulty=game.difficulty,
         creation_date=game.creation_date,
         guesses=await game.guesses.all().values_list("value", flat=True),
         result=await game.result,
+        status=await game.status,
         finished_date=await game.finished_date,
     )
 

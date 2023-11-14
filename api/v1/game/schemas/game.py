@@ -35,11 +35,11 @@ class GameStatusResponse(BaseModel):
     id: UUID
     _game_word: str
     guesses_left: int
-    status: GameStatus
     difficulty: GameDifficulty
     creation_date: datetime
     guesses: list[GuessSchema]
     result: GameResult | None
+    status: GameStatus
     finished_date: datetime | None
 
 
