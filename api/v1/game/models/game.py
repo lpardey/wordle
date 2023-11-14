@@ -64,8 +64,3 @@ class Game(Model):
 
         if game_status == GameStatus.FINISHED:
             return datetime.utcnow()
-
-    @property
-    async def ongoing(self) -> bool:
-        game_status = await self.status
-        return game_status == GameStatus.WAITING_FOR_GUESS
