@@ -68,7 +68,6 @@ async def get_game_status(
         creation_date=game.creation_date,
         guesses=await game.guesses.all().values_list("value", flat=True),
         result=await game.result,
-        ongoing=await game.ongoing,
         finished_date=await game.finished_date,
     )
 
@@ -126,7 +125,7 @@ async def get_last_game(current_user: Annotated[User, Depends(get_current_active
         return LastGameResponse(
             game_id=last_game.id,
             game_word=last_game.game_word,
-            ongoing=await last_game.ongoing,
+            status=await last_game.status,
             finished_date=await last_game.finished_date,
         )
     raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")

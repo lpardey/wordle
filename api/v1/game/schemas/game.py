@@ -40,7 +40,6 @@ class GameStatusResponse(BaseModel):
     creation_date: datetime
     guesses: list[GuessSchema]
     result: GameResult | None
-    ongoing: bool
     finished_date: datetime | None
 
 
@@ -76,5 +75,5 @@ class TakeAGuessResponse(BasicResponse):
 class LastGameResponse(BaseModel):
     game_id: UUID
     game_word: str
-    ongoing: bool
+    status: GameStatus
     finished_date: datetime | None
