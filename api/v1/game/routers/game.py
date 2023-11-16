@@ -54,9 +54,9 @@ async def create_game(current_user: Annotated[User, Depends(get_current_active_u
 
 @router.get("/status/last_game")
 async def get_last_game_status(current_user: Annotated[User, Depends(get_current_active_user)]) -> GameStatusResponse:
-    last_game = await current_user.games.all().order_by("-id").first()
-    game_status = await get_game_status(last_game.id, current_user)
-    return game_status
+    last_game = await current_user.games.all().order_by("-creation_date").first()
+    last_game_status = await get_game_status(last_game.id, current_user)
+    return last_game_status
 
 
 @router.get("/status/{game_id}")
