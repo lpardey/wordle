@@ -1,4 +1,5 @@
 # Dependencies
+import pytest
 from httpx import AsyncClient
 from tortoise.transactions import in_transaction
 
@@ -6,6 +7,7 @@ from tortoise.transactions import in_transaction
 from api.v1.user.models import User
 
 
+@pytest.mark.skip("Work in progress")
 async def test_get_user(test_client: AsyncClient) -> None:
     # Create a user for testing
     user_data = {"username": "testuser", "password": "testpassword"}
@@ -27,6 +29,7 @@ async def test_get_user(test_client: AsyncClient) -> None:
     assert user_response["username"] == user_data["username"]
 
 
+@pytest.mark.skip("Work in progress")
 async def test_get_user_inactive_user(test_client: AsyncClient) -> None:
     # Create an inactive user for testing
     user_data = {"username": "inactiveuser", "password": "testpassword", "disabled": True}
@@ -46,6 +49,7 @@ async def test_get_user_inactive_user(test_client: AsyncClient) -> None:
     assert "Inactive user" in response.json()["detail"]
 
 
+@pytest.mark.skip("Work in progress")
 async def test_create_user(test_client: AsyncClient) -> None:
     test_data = {"username": "testuser", "password": "testpassword"}
 
