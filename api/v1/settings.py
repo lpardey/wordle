@@ -2,10 +2,12 @@
 from functools import lru_cache
 
 # Dependencies
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
+    model_config = SettingsConfigDict(case_sensitive=True)
+
     APP_NAME: str = "Wordlematic"
     DATABASE_URL: str = "sqlite://db.sqlite3"
     DATABASE_MODELS: list[str] = ["api.v1.game.models", "api.v1.user.models"]
@@ -19,9 +21,6 @@ class Settings(BaseSettings):
     HOST: str = "localhost"
     PORT: int = 8000
     BASE_URL: str = f"{HOST}:{PORT}/"
-
-    class Config:
-        case_sensitive: bool = True
 
 
 @lru_cache()
