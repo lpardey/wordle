@@ -28,7 +28,12 @@ class WordleGame:
     def validate_guess(self) -> None:
         guess = self.game_state.guess
         if not guess.isalpha():
-            raise WordleException(f"Invalid guess: At least one of the characters in '{guess}' is not alphabetic.")
+            message = (
+                "Guess cannot be empty!"
+                if guess == ""
+                else f"Invalid guess: At least one of the characters in '{guess}' is not alphabetic."
+            )
+            raise WordleException(message)
         if len(guess) != 5:
             raise WordleException(f"Invalid guess: '{guess}' does not have 5 letters.")
         if guess not in AllWords.words:
