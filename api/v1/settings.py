@@ -8,11 +8,6 @@ from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
     APP_NAME: str = "Wordlematic"
     DATABASE_URL: str = "sqlite://db.sqlite3"
-    ALLOW_ORIGINS: list[str] = [
-        "http://localhost",
-        "http://localhost:8000",
-        "http://localhost:3000",
-    ]
     DATABASE_MODELS: list[str] = ["api.v1.game.models", "api.v1.user.models"]
     SECRET_KEY: str = "c2be1062540cd526c982764243e6ab5247fb4d638d4a4f088ce904d4fda63b45"  # openssl rand -hex 32
     REGISTRATION_TOKEN_LIFETIME: int = 120  # TODO
