@@ -59,6 +59,6 @@ def basic_game_state(
     return GameState(id=game_id, game_word=game_word, guess=guess, status=status, result=result)
 
 
-@pytest.fixture()
+@pytest.fixture
 def basic_wordle_game(basic_game_state: GameState) -> WordleGame:
     return WordleGame(game_state=basic_game_state)
