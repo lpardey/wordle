@@ -24,7 +24,6 @@ async def test_app() -> AsyncGenerator:
     # Use an in-memory SQLite database for testing
     testing_db_url = "sqlite://:memory:"
     app.dependency_overrides[get_settings] = lambda: Settings(DATABASE_URL=testing_db_url)
-
     # Initializes and finalizes the Tortoise ORM for testing, specifying the models to be used and creating the in-memory database.
     initializer(SETTINGS.DATABASE_MODELS, db_url=testing_db_url, create_db=True)
     await create_records_in_db()

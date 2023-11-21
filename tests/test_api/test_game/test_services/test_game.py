@@ -1,5 +1,5 @@
 # Standard Library
-import unittest.mock
+from unittest.mock import Mock, PropertyMock, patch
 
 # Dependencies
 import pytest
@@ -53,6 +53,19 @@ def test_validate_guess_failure(player_guess: str, expected_result: str, basic_w
     with pytest.raises(WordleException) as exc:
         basic_wordle_game.validate_guess()
     assert str(exc.value) == expected_result
+
+
+@pytest.mark.parametrize(
+    "player_guess, expected_result",
+    [
+        pytest.param("CLOUD", GuessResult.NOT_GUESSED, id="Guess doesn't match game word"),
+        pytest.param("PIZZA", GuessResult.GUESSED, id="Guess matches game word"),
+    ],
+)
+def test_get_guess_result(expected_result: GuessResult, player_guess: str, basic_wordle_game: WordleGame):
+    basic_wordle_game.game_state.guess = player_guess
+    guess_result = basic_wordle_game.get_guess_result()
+    assert guess_result == expected_result
 
 
 @pytest.mark.skip("Work in progress")
@@ -110,10 +123,8 @@ def test_add_guess(expected_result: list[str], guesses: list[str], guess: str, b
         pytest.param(6, False, id="All guesses left are not a defeat"),
     ],
 )
-@unittest.mock.patch.object(GameState, "guesses_left", new_callable=unittest.mock.PropertyMock)
-def test_is_defeat(
-    m_guesses_left: unittest.mock.Mock, basic_wordle_game: WordleGame, guesses_left: int, expected_result: bool
-):
+@patch.object(GameState, "guesses_left", new_callable=PropertyMock)
+def test_is_defeat(m_guesses_left: Mock, basic_wordle_game: WordleGame, guesses_left: int, expected_result: bool):
     m_guesses_left.return_value = guesses_left
     result = basic_wordle_game.is_defeat()
     assert m_guesses_left.call_count == 1
@@ -142,11 +153,11 @@ def test_is_defeat(
         ),
     ],
 )
-@unittest.mock.patch.object(WordleGame, "is_victory")
-@unittest.mock.patch.object(WordleGame, "is_defeat")
+@patch.object(WordleGame, "is_victory")
+@patch.object(WordleGame, "is_defeat")
 def test_update_game_state(
-    m_is_defeat: unittest.mock.Mock,
-    m_is_victory: unittest.mock.Mock,
+    m_is_defeat: Mock,
+    m_is_victory: Mock,
     basic_wordle_game: WordleGame,
     is_victory_result: bool,
     is_defeat_result: bool,
@@ -172,15 +183,15 @@ def test_update_game_state(
         pytest.param("SHEEP", GuessResult.NOT_GUESSED, GuessResult.NOT_GUESSED, id="Player doesn't guess"),
     ],
 )
-@unittest.mock.patch.object(WordleGame, "validate_guess", return_value=None)
-@unittest.mock.patch.object(WordleGame, "validate_game_status", return_value=None)
-@unittest.mock.patch.object(WordleGame, "add_guess", return_value=None)
-@unittest.mock.patch.object(WordleGame, "update_game_state")
+@patch.object(WordleGame, "validate_guess", return_value=None)
+@patch.object(WordleGame, "validate_game_status", return_value=None)
+@patch.object(WordleGame, "add_guess", return_value=None)
+@patch.object(WordleGame, "update_game_state")
 def test_guess_success(
-    m_update_game_state: unittest.mock.Mock,
-    m_add_guess: unittest.mock.Mock,
-    m_validate_game_status: unittest.mock.Mock,
-    m_validate_guess: unittest.mock.Mock,
+    m_update_game_state: Mock,
+    m_add_guess: Mock,
+    m_validate_game_status: Mock,
+    m_validate_guess: Mock,
     guess: str,
     update_game_state_result: GuessResult,
     expected_guess_result: GuessResult,
@@ -231,9 +242,9 @@ def test_guess_success(
         pytest.param("SHEEP", GameStatus.FINISHED, None, WordleException("Game is over!"), id="Game is finished"),
     ],
 )
-@unittest.mock.patch.object(GameState, "status", new_callable=unittest.mock.PropertyMock)
+@patch.object(GameState, "status", new_callable=PropertyMock)
 def test_guess_failure(
-    m_game_state_status: unittest.mock.Mock,
+    m_game_state_status: Mock,
     guess: str,
     game_status: GameStatus,
     validate_guess_side_effect: WordleException | None,

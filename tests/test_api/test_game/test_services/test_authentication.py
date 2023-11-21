@@ -1,5 +1,5 @@
 # Standard Library
-from unittest import mock
+from unittest.mock import Mock, patch
 
 # Dependencies
 import pytest

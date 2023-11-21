@@ -12,13 +12,11 @@ from .settings import get_settings
 
 SETTINGS = get_settings()
 
-MODELS = ["api.v1.game.models", "api.v1.user.models"]
-
 app = FastAPI(title=SETTINGS.APP_NAME)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[SETTINGS.ALLOW_ORIGINS],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -31,7 +29,7 @@ app.include_router(game_router)
 register_tortoise(
     app,
     db_url=SETTINGS.DATABASE_URL,
-    modules={"models": MODELS},
+    modules={"models": SETTINGS.DATABASE_MODELS},
     add_exception_handlers=True,
     generate_schemas=True,
 )
