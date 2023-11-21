@@ -3,4 +3,9 @@ flake8
 isort
 mypy
 pytest
+
+# pytest plug-in for async testing
 pytest-asyncio
+
+# Asynchronous Server Gateway Interface. This allows mocking or testing ASGI applications without having to spin up an ASGI server.
+asgi-lifespan
