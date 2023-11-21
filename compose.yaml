@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
       context: .
       target: development
-    command: ["uvicorn", "--host", "0.0.0.0", "wordle_api.main:app"]
+    command: ["uvicorn", "--host", "0.0.0.0", "api.v1.main:app"]
     ports:
       - "8000:8000"  # esto es solo para el mundo exterior, y que puedas ver los docs
     volumes:

@@ -11,3 +11,6 @@ import_heading_stdlib = "Standard Library"
 import_heading_thirdparty = "Dependencies"
 import_heading_firstparty = "From apps"
 import_heading_localfolder = "Local imports"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
