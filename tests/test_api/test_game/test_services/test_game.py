@@ -1,4 +1,5 @@
 # Standard Library
+from collections import Counter
 from unittest.mock import Mock, PropertyMock, patch
 
 # Dependencies
@@ -7,7 +8,7 @@ import pytest
 # From apps
 from api.v1.game.schemas.game import GameState
 from api.v1.game.services.game import WordleException, WordleGame
-from api.v1.game.services.resources.schemas import GameResult, GameStatus, GuessResult
+from api.v1.game.services.resources.schemas import GameResult, GameStatus, GuessResult, LetterStatus
 
 
 def test_validate_game_status_success(basic_wordle_game: WordleGame):
@@ -32,7 +33,7 @@ def test_validate_guess_success(basic_wordle_game: WordleGame):
 
 
 @pytest.mark.parametrize(
-    "player_guess, expected_result",
+    "guess, expected_result",
     [
         pytest.param(
             "125GU",
@@ -48,70 +49,57 @@ def test_validate_guess_success(basic_wordle_game: WordleGame):
         pytest.param("", "Guess cannot be empty!", id="Guess is empty"),
     ],
 )
-def test_validate_guess_failure(player_guess: str, expected_result: str, basic_wordle_game: WordleGame):
-    basic_wordle_game.game_state.guess = player_guess
+def test_validate_guess_failure(guess: str, expected_result: str, basic_wordle_game: WordleGame):
+    basic_wordle_game.game_state.guess = guess
     with pytest.raises(WordleException) as exc:
         basic_wordle_game.validate_guess()
     assert str(exc.value) == expected_result
 
 
 @pytest.mark.parametrize(
-    "player_guess, expected_result",
+    "guess, expected_result",
     [
         pytest.param("CLOUD", GuessResult.NOT_GUESSED, id="Guess doesn't match game word"),
         pytest.param("PIZZA", GuessResult.GUESSED, id="Guess matches game word"),
     ],
 )
-def test_get_guess_result(expected_result: GuessResult, player_guess: str, basic_wordle_game: WordleGame):
-    basic_wordle_game.game_state.guess = player_guess
+def test_get_guess_result(expected_result: GuessResult, guess: str, basic_wordle_game: WordleGame):
+    basic_wordle_game.game_state.guess = guess
     guess_result = basic_wordle_game.get_guess_result()
     assert guess_result == expected_result
 
 
-@pytest.mark.skip("Work in progress")
 @pytest.mark.parametrize(
-    "guess, guesses, expected_result",
+    "guess, word, expected_result",
     [
-        pytest.param("sheep", [], ["SHEEP"], id="First guess."),
-        pytest.param("cloud", ["SHEEP"], ["SHEEP", "CLOUD"], id="One or more guesses in game state."),
+        pytest.param("APPLE", "APPLE", [LetterStatus.IN_PLACE] * 5, id="All letters in place"),
+        pytest.param("PIZZA", "WORLD", [LetterStatus.NOT_PRESENT] * 5, id="All letters not present"),
         pytest.param(
-            "cloud",
-            ["SHEEP", "SHEEP", "SHEEP", "SHEEP", "SHEEP"],
-            ["SHEEP", "SHEEP", "SHEEP", "SHEEP", "SHEEP", "CLOUD"],
-            id="All possible guesses in game state.",
+            "CLOUD",
+            "COLDS",
+            [
+                LetterStatus.IN_PLACE,
+                LetterStatus.PRESENT,
+                LetterStatus.PRESENT,
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.PRESENT,
+            ],
+            id="Letters in place, present and not present",
         ),
     ],
 )
-def test_add_guess(expected_result: list[str], guesses: list[str], guess: str, basic_wordle_game: WordleGame):
-    basic_wordle_game.game_state.guesses = guesses
-    basic_wordle_game.add_guess(guess=guess)
-    assert basic_wordle_game.game_state.guesses == expected_result
-
-
-# @pytest.mark.parametrize(
-#     "guesses, expected_result",
-#     [
-#         pytest.param([], False, id="Not victory. No guesses in game state."),
-#         pytest.param(["SHEEP"], False, id="Not victory. One guess in game state."),
-#         pytest.param(
-#             ["SHEEP", "SHEEP", "SHEEP", "SHEEP", "SHEEP", "SHEEP"],
-#             False,
-#             id="Not victory. All possible guesses in game state.",
-#         ),
-#         pytest.param(["PIZZA"], True, id="Victory. One guess in game state."),
-#         pytest.param(["SHEEP", "PIZZA"], True, id="Victory. More than one guess in game state."),
-#         pytest.param(
-#             ["SHEEP", "SHEEP", "SHEEP", "SHEEP", "SHEEP", "PIZZA"],
-#             True,
-#             id="Victory. All possible guesses in game state.",
-#         ),
-#     ],
-# )
-# def test_is_victory(expected_result: bool, guesses: list[str]):
-#     game_state = GameState(player=Player(statistics=PlayerStatistics()), game_word="PIZZA", guesses=guesses)
-#     wordle = WordleGame(game_state=game_state)
-#     result = wordle.is_victory()
-#     assert result == expected_result
+@patch.object(Counter, "__getitem__", side_effect=lambda x: len(x))
+def test_compare(
+    m_counter__getitem__: Mock,
+    guess: str,
+    word: str,
+    expected_result: list[LetterStatus],
+    basic_wordle_game: WordleGame,
+):
+    basic_wordle_game.game_state.guess = guess
+    basic_wordle_game.game_state.game_word = word
+    result = basic_wordle_game.compare()
+    assert result == expected_result
 
 
 @pytest.mark.skip("Work in progress")
