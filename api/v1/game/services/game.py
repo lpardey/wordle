@@ -46,21 +46,37 @@ class WordleGame:
 
     def compare(self) -> list[LetterStatus]:
         """
-        This function assumes word and guess are the same length.
+        This function assumes guess and word are the same length.
         """
-
-        def _compare_letters(guess_letter: str, word_letter: str) -> LetterStatus:
-            if guess_letter == word_letter:
-                return LetterStatus.IN_PLACE
-            if guess_letter in letter_count and letter_count[guess_letter] > 0:
-                letter_count[guess_letter] -= 1
-                return LetterStatus.PRESENT
-            return LetterStatus.NOT_PRESENT
-
         guess = self.game_state.guess
         word = self.game_state.game_word
-        letter_count = Counter(word)
-        guess_letters_status = [
-            _compare_letters(guess_letter, word_letter) for guess_letter, word_letter in zip(guess, word)
-        ]
+        letters_count = Counter(word)
+        used_letters = set()  # Initialize an empty set to keep track of used letters.
+        guess_letters_status = self.compare_letters(guess, word, letters_count, used_letters)
         return guess_letters_status
+
+    def compare_letters(self, guess: str, word: str, letters_count: Counter, used_letters: set) -> list[LetterStatus]:
+        """
+        Compare each pair of letters in guess and word.
+        """
+        return [
+            self.compare_letters_pair(guess_letter, word_letter, letters_count, used_letters)
+            for guess_letter, word_letter in zip(guess, word)
+        ]
+
+    def compare_letters_pair(
+        self, guess_letter: str, word_letter: str, letters_count: Counter, used_letters: set
+    ) -> LetterStatus:
+        if guess_letter == word_letter:
+            return LetterStatus.IN_PLACE
+        if guess_letter in letters_count and letters_count[guess_letter] > 0:
+            letters_count[guess_letter] -= 1
+            return self.get_present_letter_status(guess_letter, letters_count, used_letters)
+        return LetterStatus.NOT_PRESENT
+
+    def get_present_letter_status(self, guess_letter: str, letters_count: Counter, used_letters: set) -> LetterStatus:
+        if guess_letter not in used_letters:
+            used_letters.add(guess_letter)
+            if letters_count[guess_letter] > 0:
+                return LetterStatus.PRESENT_REPEATED
+        return LetterStatus.PRESENT
