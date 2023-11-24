@@ -26,3 +26,4 @@ class LetterStatus(IntEnum):
     IN_PLACE = 0
     PRESENT = 1
     NOT_PRESENT = 2
+    PRESENT_REPEATED = 3
