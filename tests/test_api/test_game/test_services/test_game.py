@@ -69,8 +69,41 @@ def test_get_guess_result(expected_result: GuessResult, guess: str, basic_wordle
     assert guess_result == expected_result
 
 
+# @pytest.mark.parametrize(
+#     "guess, word, expected_result",
+#     [
+#         pytest.param("APPLE", "APPLE", [LetterStatus.IN_PLACE] * 5, id="All letters in place"),
+#         pytest.param("PIZZA", "WORLD", [LetterStatus.NOT_PRESENT] * 5, id="All letters not present"),
+#         pytest.param(
+#             "CLOUD",
+#             "COLDS",
+#             [
+#                 LetterStatus.IN_PLACE,
+#                 LetterStatus.PRESENT,
+#                 LetterStatus.PRESENT,
+#                 LetterStatus.NOT_PRESENT,
+#                 LetterStatus.PRESENT,
+#             ],
+#             id="Letters in place, present and not present",
+#         ),
+#     ],
+# )
+# @patch.object(Counter, "__getitem__", side_effect=lambda x: len(x))
+# def test_compare(
+#     m_counter__getitem__: Mock,
+#     guess: str,
+#     word: str,
+#     expected_result: list[LetterStatus],
+#     basic_wordle_game: WordleGame,
+# ):
+#     basic_wordle_game.game_state.guess = guess
+#     basic_wordle_game.game_state.game_word = word
+#     result = basic_wordle_game.compare()
+#     assert result == expected_result
+
+
 @pytest.mark.parametrize(
-    "guess, word, expected_result",
+    "guess, word, compare_letters_result",
     [
         pytest.param("APPLE", "APPLE", [LetterStatus.IN_PLACE] * 5, id="All letters in place"),
         pytest.param("PIZZA", "WORLD", [LetterStatus.NOT_PRESENT] * 5, id="All letters not present"),
@@ -86,19 +119,80 @@ def test_get_guess_result(expected_result: GuessResult, guess: str, basic_wordle
             ],
             id="Letters in place, present and not present",
         ),
+        pytest.param(
+            "EMBER",
+            "FLYER",
+            [
+                LetterStatus.PRESENT_REPEATED,
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.IN_PLACE,
+                LetterStatus.IN_PLACE,
+            ],
+            id="Letters in place, present and not present",
+        ),
+        pytest.param(
+            "EMBER",
+            "QUEEN",
+            [
+                LetterStatus.PRESENT,
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.IN_PLACE,
+                LetterStatus.NOT_PRESENT,
+            ],
+            id="Letters in place, present and not present",
+        ),
+        pytest.param(
+            "CONDO",
+            "COOCH",
+            [
+                LetterStatus.IN_PLACE,
+                LetterStatus.IN_PLACE,
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.PRESENT,
+            ],
+            id="Letters in place, present and not present",
+        ),
     ],
 )
-@patch.object(Counter, "__getitem__", side_effect=lambda x: len(x))
 def test_compare(
-    m_counter__getitem__: Mock,
     guess: str,
     word: str,
-    expected_result: list[LetterStatus],
+    compare_letters_result: list[LetterStatus],
     basic_wordle_game: WordleGame,
 ):
     basic_wordle_game.game_state.guess = guess
     basic_wordle_game.game_state.game_word = word
+    basic_wordle_game.compare_letters = Mock(return_value=compare_letters_result)
+
     result = basic_wordle_game.compare()
+
+    assert result == compare_letters_result
+    assert basic_wordle_game.compare_letters.call_count == 1
+    assert len(result) == len(guess) == len(word)
+
+
+# TODO: Check should be 16 passing test but only 15 passing
+@pytest.mark.parametrize(
+    "guess_letter, word_letter, letters_count, used_letters, expected_result",
+    [
+        pytest.param("A", "A", Counter("APPLE"), set(), LetterStatus.IN_PLACE, id="Letter in place"),
+        pytest.param("P", "A", Counter("APPLE"), set("P"), LetterStatus.PRESENT, id="Letter present"),
+        pytest.param("P", "A", Counter("APPLE"), set(), LetterStatus.PRESENT_REPEATED, id="Letter present repeated"),
+        pytest.param("S", "A", Counter("APPLE"), set(), LetterStatus.NOT_PRESENT, id="Letter not present"),
+    ],
+)
+def test_compare_letters_pair(
+    guess_letter: str,
+    word_letter: str,
+    letters_count: Counter,
+    used_letters: set,
+    expected_result: LetterStatus,
+    basic_wordle_game: WordleGame,
+):
+    result = basic_wordle_game.compare_letters_pair(guess_letter, word_letter, letters_count, used_letters)
     assert result == expected_result
 
 
