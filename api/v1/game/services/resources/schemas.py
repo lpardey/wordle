@@ -27,16 +27,6 @@ class LetterStatus(IntEnum):
     IN_PLACE = 0
     PRESENT = 1
     NOT_PRESENT = 2
-    PRESENT_REPEATED = 3
 
 
-type LetterStatusList = list[
-    Literal[
-        LetterStatus.IN_PLACE,
-        LetterStatus.PRESENT,
-        LetterStatus.PRESENT_REPEATED,
-        LetterStatus.NOT_PRESENT,
-    ]
-]
-
-type PresentLetterStatus = Literal[LetterStatus.PRESENT, LetterStatus.PRESENT_REPEATED]
+LetterStatusLiteral = Literal[LetterStatus.IN_PLACE, LetterStatus.PRESENT, LetterStatus.NOT_PRESENT]
