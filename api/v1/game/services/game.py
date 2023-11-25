@@ -1,17 +1,10 @@
 # Standard Library
 from collections import Counter
-from typing import Literal
 
 # From apps
 from api.v1.game.schemas.game import GameState
 from api.v1.game.services.resources.game_word import AllWords
-from api.v1.game.services.resources.schemas import (
-    GameStatus,
-    GuessResult,
-    LetterStatus,
-    LetterStatusList,
-    PresentLetterStatus,
-)
+from api.v1.game.services.resources.schemas import GameStatus, GuessResult, LetterStatus, LetterStatusLiteral
 
 
 class WordleException(Exception):
@@ -51,7 +44,7 @@ class WordleGame:
             return GuessResult.GUESSED
         return GuessResult.NOT_GUESSED
 
-    def compare(self) -> LetterStatusList:
+    def compare(self) -> list[LetterStatusLiteral]:
         """
         This function assumes guess and word are the same length.
         """
@@ -60,38 +53,50 @@ class WordleGame:
         word_counter = Counter(word)
         guess_counter = Counter(guess)
         letter_tracker = Counter()
-        result = []
-
-        for guess_letter, word_letter in zip(guess, word):
-            if guess_letter == word_letter:
-                letter_tracker[guess_letter] += 1
-                result.append(LetterStatus.IN_PLACE)
-            elif guess_letter in word:
-                present_letter_status = self.get_present_letter_status(
-                    guess_letter,
-                    guess_counter,
-                    word_counter,
-                    letter_tracker,
-                )
-                result.append(present_letter_status)
-            else:
-                result.append(LetterStatus.NOT_PRESENT)
-
+        result = self.get_letter_status_list(guess, word, guess_counter, word_counter, letter_tracker)
         return result
 
-    def get_present_letter_status(
-        self, letter: str, guess_counter: Counter, word_counter: Counter, letter_tracker: Counter
-    ) -> PresentLetterStatus:
-        if guess_counter[letter] <= word_counter[letter]:
+    def get_letter_status_list(
+        self, guess: str, word: str, guess_counter: Counter, word_counter: Counter, letter_tracker: Counter
+    ) -> list[LetterStatusLiteral]:
+        return [
+            self.get_letter_status(guess_letter, word_letter, guess_counter, word_counter, letter_tracker)
+            for guess_letter, word_letter in zip(guess, word)
+        ]
+
+    def get_letter_status(
+        self,
+        guess_letter: str,
+        word_letter: str,
+        guess_counter: Counter,
+        word_counter: Counter,
+        letter_tracker: Counter,
+    ) -> LetterStatusLiteral:
+        if guess_letter == word_letter:
+            letter_tracker[guess_letter] += 1
+            return LetterStatus.IN_PLACE
+
+        if self.is_guess_letter_present(guess_letter, word_counter, guess_counter, letter_tracker):
             return LetterStatus.PRESENT
-        else:
-            letter_tracker[letter] += 1
-            if letter_tracker[letter] < word_counter[letter]:
-                return LetterStatus.PRESENT
-            return LetterStatus.PRESENT_REPEATED
+
+        return LetterStatus.NOT_PRESENT
+
+    @staticmethod
+    def is_guess_letter_present(
+        guess_letter: str, word_counter: Counter, guess_counter: Counter, letter_tracker: Counter
+    ) -> bool:
+        if guess_letter in word_counter:
+            if guess_counter[guess_letter] <= word_counter[guess_letter]:
+                return True
+
+            # Update letter tracker and check if guess letter is still present in the word
+            letter_tracker[guess_letter] += 1
+            return letter_tracker[guess_letter] < word_counter[guess_letter]
+
+        return False
 
 
-# NAIVE APPROACH
+# NAIVE V1
 # def compare(self) -> list[LetterStatus]:
 #     """
 #     This function assumes guess and word are the same length.
@@ -122,4 +127,33 @@ class WordleGame:
 #                     result.append(LetterStatus.PRESENT_REPEATED)
 #         else:
 #             result.append(LetterStatus.NOT_PRESENT)
+#     return result
+
+# NAIVE V2
+# def compare(self) -> LetterStatusList:
+#     """
+#     This function assumes guess and word are the same length.
+#     """
+#     guess = self.game_state.guess
+#     word = self.game_state.game_word
+#     word_counter = Counter(word)
+#     guess_counter = Counter(guess)
+#     letter_tracker = Counter()
+#     result = []
+
+#     for guess_letter, word_letter in zip(guess, word):
+#         if guess_letter == word_letter:
+#             letter_tracker[guess_letter] += 1
+#             result.append(LetterStatus.IN_PLACE)
+#         elif guess_letter in word:
+#             present_letter_status = self.get_present_letter_status(
+#                 guess_letter,
+#                 guess_counter,
+#                 word_counter,
+#                 letter_tracker,
+#             )
+#             result.append(present_letter_status)
+#         else:
+#             result.append(LetterStatus.NOT_PRESENT)
+
 #     return result
