@@ -141,25 +141,39 @@ def test_compare(guess: str, word: str, expected_result: list[LetterStatusLitera
     assert len(result) == len(guess) == len(word)
 
 
-# @pytest.mark.parametrize(
-#     "guess_letter, word_letter, letters_count, used_letters, expected_result",
-#     [
-#         pytest.param("A", "A", Counter("APPLE"), set(), LetterStatus.IN_PLACE, id="Letter in place"),
-#         pytest.param("P", "A", Counter("APPLE"), set("P"), LetterStatus.PRESENT, id="Letter present"),
-#         pytest.param("P", "A", Counter("APPLE"), set(), LetterStatus.PRESENT_REPEATED, id="Letter present repeated"),
-#         pytest.param("S", "A", Counter("APPLE"), set(), LetterStatus.NOT_PRESENT, id="Letter not present"),
-#     ],
-# )
-# def test_compare_letters_pair(
-#     guess_letter: str,
-#     word_letter: str,
-#     letters_count: Counter,
-#     used_letters: set,
-#     expected_result: LetterStatus,
-#     basic_wordle_game: WordleGame,
-# ):
-#     result = basic_wordle_game.compare_letters_pair(guess_letter, word_letter, letters_count, used_letters)
-#     assert result == expected_result
+@patch.object(WordleGame, "is_guess_letter_present")
+@pytest.mark.parametrize(
+    "guess, word, guess_letter, word_letter, is_guess_letter_present_result, expected_result",
+    [
+        pytest.param("APPLE", "APPLE", "A", "A", None, LetterStatus.IN_PLACE, id="Letter in place"),
+        pytest.param("EMBER", "FLYER", "E", "F", True, LetterStatus.PRESENT, id="Letter present"),
+        pytest.param("PIZZA", "WORLD", "P", "W", False, LetterStatus.NOT_PRESENT, id="Letter not present"),
+    ],
+)
+def test_get_letter_status(
+    mock_is_guess_letter_present: Mock,
+    guess: str,
+    word: str,
+    guess_letter: str,
+    word_letter: str,
+    is_guess_letter_present_result: bool | None,
+    expected_result: LetterStatusLiteral,
+    basic_wordle_game: WordleGame,
+):
+    guess_counter = Counter(guess)
+    word_counter = Counter(word)
+    letter_tracker = Counter()
+    mock_is_guess_letter_present.return_value = is_guess_letter_present_result
+
+    result = basic_wordle_game.get_letter_status(
+        guess_letter, word_letter, guess_counter, word_counter, letter_tracker
+    )
+
+    assert result == expected_result
+    if is_guess_letter_present_result is None:
+        mock_is_guess_letter_present.assert_not_called()
+    else:
+        mock_is_guess_letter_present.assert_called_once()
 
 
 @pytest.mark.skip("Work in progress")
