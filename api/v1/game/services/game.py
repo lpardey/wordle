@@ -60,12 +60,17 @@ class WordleGame:
         self, guess: str, word: str, guess_counter: Counter, word_counter: Counter, letter_tracker: Counter
     ) -> list[LetterStatusLiteral]:
         return [
-            self.get_letter_status(guess_letter, word_letter, guess_counter, word_counter, letter_tracker)
-            for guess_letter, word_letter in zip(guess, word)
+            self.get_letter_status(
+                guess, word, index, guess_letter, word_letter, guess_counter, word_counter, letter_tracker
+            )
+            for index, (guess_letter, word_letter) in enumerate(zip(guess, word))
         ]
 
     def get_letter_status(
         self,
+        guess: str,
+        word: str,
+        index: int,
         guess_letter: str,
         word_letter: str,
         guess_counter: Counter,
@@ -76,22 +81,40 @@ class WordleGame:
             letter_tracker[guess_letter] += 1
             return LetterStatus.IN_PLACE
 
-        if self.is_guess_letter_present(guess_letter, word_counter, guess_counter, letter_tracker):
+        if self.is_guess_letter_present(guess, word, index, guess_letter, word_counter, guess_counter, letter_tracker):
             return LetterStatus.PRESENT
 
         return LetterStatus.NOT_PRESENT
 
     @staticmethod
     def is_guess_letter_present(
-        guess_letter: str, word_counter: Counter, guess_counter: Counter, letter_tracker: Counter
+        guess: str,
+        word: str,
+        index: int,
+        guess_letter: str,
+        word_counter: Counter,
+        guess_counter: Counter,
+        letter_tracker: Counter,
     ) -> bool:
         if guess_letter in word_counter:
             if guess_counter[guess_letter] <= word_counter[guess_letter]:
                 return True
 
-            # Update letter tracker and check if guess letter is still present in the word
             letter_tracker[guess_letter] += 1
-            return letter_tracker[guess_letter] < word_counter[guess_letter]
+            if letter_tracker[guess_letter] == word_counter[guess_letter] or letter_tracker[guess_letter] == len(word):
+                return False
+            else:
+                try:
+                    next_letter_index = guess.index(guess_letter, index + 1)
+                except ValueError:
+                    return True
+
+            if guess[next_letter_index] == word[next_letter_index]:
+                return False
+
+            if letter_tracker[guess_letter] != guess_counter[guess_letter]:
+                return False
+            return True
 
         return False
 
@@ -157,3 +180,53 @@ class WordleGame:
 #             result.append(LetterStatus.NOT_PRESENT)
 
 #     return result
+#
+# Naive V3
+# def compare() -> list[LetterStatusLiteral]:
+#     """
+#     This function assumes guess and word are the same length.
+#     """
+#     a_g = "EMBER"
+#     a_w = "FLYER"
+#     b_g = "ONION"
+#     b_w = "SOURS"
+#     c_g = "EMBER"
+#     c_w = "QUEEN"
+#     d_g = "SLOTZ"
+#     d_w = "COLDS"
+#     guess = d_g
+#     word = d_w
+#     result = list(range(len(guess)))
+#     index_to_letter_in_place = dict()
+#     index_to_letter_present = dict()
+#     final = dict()
+
+#     # First pass: Check for correct positions
+#     for i in range(len(guess)):
+#         if guess[i] == word[i]:
+#             index_to_letter_in_place[i] = guess[i]
+#             result[i] = LetterStatus.IN_PLACE
+#         elif guess[i] in word:
+#             index_to_letter_present[i] = guess[i]
+
+#     for index, letter in index_to_letter_present.items():
+#         if letter in index_to_letter_in_place.values():
+#             if len(index_to_letter_present) == len(index_to_letter_in_place):
+#                 final.update({index: letter})
+#             continue
+
+#         if letter not in index_to_letter_in_place.values() and len(final) < len(index_to_letter_present) - 1:
+#             final.update({index: letter})
+
+#     for i in result:
+#         if isinstance(i, LetterStatus):
+#             continue
+#         elif i in final:
+#             result[i] = LetterStatus.PRESENT
+#         else:
+#             result[i] = LetterStatus.NOT_PRESENT
+
+#     print(f"Letters in place: {index_to_letter_in_place}")
+#     print(f"Letters present: {index_to_letter_present}")
+#     print(f"Final: {final}")
+#     print(f"Result: {result}")
