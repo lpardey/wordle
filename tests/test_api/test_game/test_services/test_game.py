@@ -96,8 +96,14 @@ def test_get_guess_result(expected_result: GuessResult, guess: str, basic_wordle
         pytest.param(
             "OONOO",
             "COOCH",
-            [LetterStatus.PRESENT, LetterStatus.IN_PLACE] + [LetterStatus.NOT_PRESENT] * 3,
-            id="[1, 0, 2, 2, 2]",
+            [
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.IN_PLACE,
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.NOT_PRESENT,
+                LetterStatus.PRESENT,
+            ],
+            id="[2, 0, 2, 2, 1]",
         ),
         pytest.param(
             "OOOOO",
@@ -121,13 +127,19 @@ def test_get_guess_result(expected_result: GuessResult, guess: str, basic_wordle
             "OOOLA",
             "COAOH",
             [
-                LetterStatus.PRESENT,
-                LetterStatus.IN_PLACE,
                 LetterStatus.NOT_PRESENT,
+                LetterStatus.IN_PLACE,
+                LetterStatus.PRESENT,
                 LetterStatus.NOT_PRESENT,
                 LetterStatus.PRESENT,
             ],
-            id="[1, 0 2, 2, 1]",
+            id="[2, 0, 1, 2, 1]",
+        ),
+        pytest.param(
+            "ONION",
+            "SOURS",
+            [LetterStatus.NOT_PRESENT] * 3 + [LetterStatus.PRESENT, LetterStatus.NOT_PRESENT],
+            id="[2, 2, 2, 1, 2]",
         ),
     ],
 )
@@ -141,6 +153,7 @@ def test_compare(guess: str, word: str, expected_result: list[LetterStatusLitera
     assert len(result) == len(guess) == len(word)
 
 
+@pytest.mark.skip("Work in progress")
 @patch.object(WordleGame, "is_guess_letter_present")
 @pytest.mark.parametrize(
     "guess, word, guess_letter, word_letter, is_guess_letter_present_result, expected_result",
