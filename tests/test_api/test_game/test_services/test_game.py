@@ -1,5 +1,4 @@
 # Standard Library
-from collections import Counter
 from unittest.mock import Mock, PropertyMock, patch
 
 # Dependencies
@@ -8,13 +7,8 @@ import pytest
 # From apps
 from api.v1.game.schemas.game import GameState
 from api.v1.game.services.game import WordleException, WordleGame
-from api.v1.game.services.resources.schemas import (
-    GameResult,
-    GameStatus,
-    GuessResult,
-    LetterStatus,
-    LetterStatusLiteral,
-)
+from api.v1.game.services.resources.schemas import GameResult, GameStatus, GuessResult, LetterStatus
+from tests.test_api.test_game.test_services.helpers.game import compare_test_data
 
 
 def test_validate_game_status_success(basic_wordle_game: WordleGame):
@@ -75,75 +69,8 @@ def test_get_guess_result(expected_result: GuessResult, guess: str, basic_wordle
     assert guess_result == expected_result
 
 
-@pytest.mark.parametrize(
-    "guess, word, expected_result",
-    [
-        pytest.param("APPLE", "APPLE", [LetterStatus.IN_PLACE] * 5, id="[0, 0, 0, 0, 0]"),
-        pytest.param("PIZZA", "WORLD", [LetterStatus.NOT_PRESENT] * 5, id="[2, 2, 2, 2, 2]"),
-        pytest.param("EMBER", "FLYER", [LetterStatus.NOT_PRESENT] * 3 + [LetterStatus.IN_PLACE] * 2, id="[2,2,2,0,0]"),
-        pytest.param(
-            "SLODZ",
-            "COLDS",
-            [LetterStatus.PRESENT] * 3 + [LetterStatus.IN_PLACE, LetterStatus.NOT_PRESENT],
-            id="[1, 1, 1, 0, 2]",
-        ),
-        pytest.param(
-            "CONDO",
-            "COOCH",
-            [LetterStatus.IN_PLACE] * 2 + [LetterStatus.NOT_PRESENT] * 2 + [LetterStatus.PRESENT],
-            id="[0, 0, 2, 2, 1]",
-        ),
-        pytest.param(
-            "OONOO",
-            "COOCH",
-            [
-                LetterStatus.NOT_PRESENT,
-                LetterStatus.IN_PLACE,
-                LetterStatus.NOT_PRESENT,
-                LetterStatus.NOT_PRESENT,
-                LetterStatus.PRESENT,
-            ],
-            id="[2, 0, 2, 2, 1]",
-        ),
-        pytest.param(
-            "OOOOO",
-            "COACH",
-            [LetterStatus.NOT_PRESENT, LetterStatus.IN_PLACE] + [LetterStatus.NOT_PRESENT] * 3,
-            id="[2, 0, 2, 2, 2]",
-        ),
-        pytest.param(
-            "EMBER",
-            "QUEEN",
-            [
-                LetterStatus.PRESENT,
-                LetterStatus.NOT_PRESENT,
-                LetterStatus.NOT_PRESENT,
-                LetterStatus.IN_PLACE,
-                LetterStatus.NOT_PRESENT,
-            ],
-            id="[1, 2, 2, 0, 2]",
-        ),
-        pytest.param(
-            "OOOLA",
-            "COAOH",
-            [
-                LetterStatus.NOT_PRESENT,
-                LetterStatus.IN_PLACE,
-                LetterStatus.PRESENT,
-                LetterStatus.NOT_PRESENT,
-                LetterStatus.PRESENT,
-            ],
-            id="[2, 0, 1, 2, 1]",
-        ),
-        pytest.param(
-            "ONION",
-            "SOURS",
-            [LetterStatus.NOT_PRESENT] * 3 + [LetterStatus.PRESENT, LetterStatus.NOT_PRESENT],
-            id="[2, 2, 2, 1, 2]",
-        ),
-    ],
-)
-def test_compare(guess: str, word: str, expected_result: list[LetterStatusLiteral], basic_wordle_game: WordleGame):
+@pytest.mark.parametrize("guess, word, expected_result", compare_test_data())
+def test_compare(guess: str, word: str, expected_result: list[LetterStatus], basic_wordle_game: WordleGame):
     basic_wordle_game.game_state.guess = guess
     basic_wordle_game.game_state.game_word = word
 
@@ -151,42 +78,6 @@ def test_compare(guess: str, word: str, expected_result: list[LetterStatusLitera
 
     assert result == expected_result
     assert len(result) == len(guess) == len(word)
-
-
-@pytest.mark.skip("Work in progress")
-@patch.object(WordleGame, "is_guess_letter_present")
-@pytest.mark.parametrize(
-    "guess, word, guess_letter, word_letter, is_guess_letter_present_result, expected_result",
-    [
-        pytest.param("APPLE", "APPLE", "A", "A", None, LetterStatus.IN_PLACE, id="Letter in place"),
-        pytest.param("EMBER", "FLYER", "E", "F", True, LetterStatus.PRESENT, id="Letter present"),
-        pytest.param("PIZZA", "WORLD", "P", "W", False, LetterStatus.NOT_PRESENT, id="Letter not present"),
-    ],
-)
-def test_get_letter_status(
-    mock_is_guess_letter_present: Mock,
-    guess: str,
-    word: str,
-    guess_letter: str,
-    word_letter: str,
-    is_guess_letter_present_result: bool | None,
-    expected_result: LetterStatusLiteral,
-    basic_wordle_game: WordleGame,
-):
-    guess_counter = Counter(guess)
-    word_counter = Counter(word)
-    letter_tracker = Counter()
-    mock_is_guess_letter_present.return_value = is_guess_letter_present_result
-
-    result = basic_wordle_game.get_letter_status(
-        guess_letter, word_letter, guess_counter, word_counter, letter_tracker
-    )
-
-    assert result == expected_result
-    if is_guess_letter_present_result is None:
-        mock_is_guess_letter_present.assert_not_called()
-    else:
-        mock_is_guess_letter_present.assert_called_once()
 
 
 @pytest.mark.skip("Work in progress")
