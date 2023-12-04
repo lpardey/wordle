@@ -1,6 +1,5 @@
 # Standard Library
 from enum import Enum, IntEnum
-from typing import Literal
 
 
 class GameResult(str, Enum):
@@ -27,6 +26,3 @@ class LetterStatus(IntEnum):
     IN_PLACE = 0
     PRESENT = 1
     NOT_PRESENT = 2
-
-
-LetterStatusLiteral = Literal[LetterStatus.IN_PLACE, LetterStatus.PRESENT, LetterStatus.NOT_PRESENT]
