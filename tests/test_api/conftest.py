@@ -61,3 +61,8 @@ def basic_game_state(
 @pytest.fixture
 def basic_wordle_game(basic_game_state: GameState) -> WordleGame:
     return WordleGame(game_state=basic_game_state)
+
+
+@pytest.fixture
+def basic_app_settings() -> Settings:
+    return get_settings()
