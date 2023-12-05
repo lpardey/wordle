@@ -1,6 +1,6 @@
 # Standard Library
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import Annotated
 
 # Dependencies
@@ -21,10 +21,10 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="account/login")
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     to_encode = data.copy()
-    expires_delta = expires_delta if expires_delta is not None else timedelta(minutes=SETTINGS.ACCESS_TOKEN_LIFETIME)
-    expire = datetime.utcnow() + expires_delta
+    expires_delta = expires_delta if expires_delta else timedelta(minutes=SETTINGS.ACCESS_TOKEN_LIFETIME)
+    expire = datetime.now(UTC) + expires_delta
     to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SETTINGS.SECRET_KEY, algorithm=SETTINGS.TOKEN_ALGORITHM)
+    encoded_jwt = jwt.encode(to_encode, key=SETTINGS.SECRET_KEY, algorithm=SETTINGS.TOKEN_ALGORITHM)
     return encoded_jwt
 
 
