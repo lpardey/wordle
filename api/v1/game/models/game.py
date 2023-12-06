@@ -1,5 +1,5 @@
 # Standard Library
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import TYPE_CHECKING
 
 # Dependencies
@@ -63,4 +63,4 @@ class Game(Model):
         game_status = await self.status
 
         if game_status == GameStatus.FINISHED:
-            return datetime.utcnow()
+            return datetime.now(UTC)
