@@ -28,7 +28,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return encoded_jwt
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> User:
+def validate_token(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
     try:
         payload = jwt.decode(token, SETTINGS.SECRET_KEY, algorithms=[SETTINGS.TOKEN_ALGORITHM])
         username = payload.get("sub")
@@ -38,9 +38,13 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
                 detail="Invalid credentials",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+        return username
     except JWTError as e:
         logger.exception(e)
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Something unexpected happened")
+
+
+async def get_current_user(username: Annotated[str, Depends(validate_token)]) -> User:
     user = await User.get_or_none(username=username)
     if user is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail=f"User with {username=} not found")
