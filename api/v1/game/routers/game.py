@@ -69,6 +69,7 @@ async def get_game_status(
         id=game.id,
         _game_word=game.game_word,
         guesses_left=await game.guesses_left,
+        max_attempts=game.max_attempts,
         difficulty=game.difficulty,
         creation_date=game.creation_date,
         guesses=await game.guesses.all().values_list("value", flat=True),

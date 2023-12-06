@@ -35,6 +35,7 @@ class GameStatusResponse(BaseModel):
     id: UUID
     _game_word: str
     guesses_left: int
+    max_attempts: int
     difficulty: GameDifficulty
     creation_date: datetime
     guesses: list[GuessValue]
