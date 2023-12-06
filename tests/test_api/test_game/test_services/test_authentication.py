@@ -1,5 +1,5 @@
 # Standard Library
-from datetime import timedelta
+from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, Mock, patch
 
 # Dependencies
@@ -20,15 +20,26 @@ from api.v1.user.models.user import User
         pytest.param(timedelta(minutes=10), id="Custom expire delta"),
     ],
 )
+@patch("api.v1.game.services.authentication.datetime")
 @patch.object(jwt, "encode")
-def test_create_access_token(mock_encode: Mock, expires_delta: timedelta | None, basic_app_settings: Settings):
+def test_create_access_token(
+    mock_encode: Mock, mock_datetime: Mock, expires_delta: timedelta | None, basic_app_settings: Settings
+):
     mock_encode.return_value = "test_encoded_token"
     test_data = {"sub": "test_username"}
+    fixed_datetime_now_value = datetime(2023, 12, 1)
+    mock_datetime.now.return_value = fixed_datetime_now_value
+    expire = expires_delta if expires_delta else timedelta(minutes=basic_app_settings.ACCESS_TOKEN_LIFETIME)
 
     encoded_token = create_access_token(test_data, expires_delta)
+    test_data.update({"exp": mock_datetime.now() + expire})
 
     assert encoded_token == mock_encode.return_value
-    mock_encode.assert_called_once()
+    mock_encode.assert_called_once_with(
+        test_data,
+        basic_app_settings.SECRET_KEY,
+        basic_app_settings.TOKEN_ALGORITHM,
+    )
 
 
 @patch("api.v1.game.services.authentication.get_current_user")
