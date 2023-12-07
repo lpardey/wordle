@@ -30,7 +30,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
 
 def validate_token(token: Annotated[str, Depends(oauth2_scheme)]) -> str:
     try:
-        payload = jwt.decode(token, SETTINGS.SECRET_KEY, algorithms=[SETTINGS.TOKEN_ALGORITHM])
+        payload = jwt.decode(token, SETTINGS.SECRET_KEY, [SETTINGS.TOKEN_ALGORITHM])
         username = payload.get("sub")
         if username is None:
             raise HTTPException(
