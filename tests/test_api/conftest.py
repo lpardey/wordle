@@ -64,5 +64,10 @@ def basic_wordle_game(basic_game_state: GameState) -> WordleGame:
 
 
 @pytest.fixture
+def basic_user() -> User:
+    return User(username="testuser", password_hash="hashed_password")
+
+
+@pytest.fixture
 def basic_app_settings() -> Settings:
     return get_settings()
