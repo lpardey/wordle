@@ -1,11 +1,12 @@
 # Dependencies
 import pytest
+from _pytest.mark.structures import ParameterSet
 
 # From apps
 from api.v1.game.services.resources.schemas import LetterStatus
 
 
-def compare_test_data() -> list[pytest.param]:
+def compare_test_data() -> list[ParameterSet]:
     return [
         pytest.param(
             "APPLE",

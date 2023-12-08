@@ -14,10 +14,12 @@ def test_validate_game_status_success(basic_wordle_game: WordleGame):
         assert False, f"No exception should be raised, but got {e}"
 
 
-def test_validate_game_status_failure(basic_wordle_game: WordleGame):
+def test_validate_game_status_raises_exc(basic_wordle_game: WordleGame):
     basic_wordle_game.game_state.status = GameStatus.FINISHED
+
     with pytest.raises(WordleException) as exc_info:
         basic_wordle_game.validate_game_status()
+
     assert str(exc_info.value) == "Game is over!"
 
 
@@ -45,10 +47,12 @@ def test_validate_guess_success(basic_wordle_game: WordleGame):
         pytest.param("", "Guess cannot be empty!", id="Guess is empty"),
     ],
 )
-def test_validate_guess_failure(guess: str, expected_result: str, basic_wordle_game: WordleGame):
+def test_validate_guess_raises_exc(guess: str, expected_result: str, basic_wordle_game: WordleGame):
     basic_wordle_game.game_state.guess = guess
+
     with pytest.raises(WordleException) as exc:
         basic_wordle_game.validate_guess()
+
     assert str(exc.value) == expected_result
 
 
@@ -61,8 +65,10 @@ def test_validate_guess_failure(guess: str, expected_result: str, basic_wordle_g
 )
 def test_get_guess_result(expected_result: GuessResult, guess: str, basic_wordle_game: WordleGame):
     basic_wordle_game.game_state.guess = guess
-    guess_result = basic_wordle_game.get_guess_result()
-    assert guess_result == expected_result
+
+    result = basic_wordle_game.get_guess_result()
+
+    assert result == expected_result
     assert len(guess) == len(basic_wordle_game.game_state.game_word)
 
 
