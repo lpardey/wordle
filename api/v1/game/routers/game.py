@@ -67,7 +67,7 @@ async def get_game_status(
     game = await get_game_by_id(game_id)
     return GameStatusResponse(
         id=game.id,
-        _game_word=game.game_word,
+        game_word=await game.in_game_word,
         guesses_left=await game.guesses_left,
         max_attempts=game.max_attempts,
         difficulty=game.difficulty,
