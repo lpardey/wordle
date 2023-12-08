@@ -1,23 +1,23 @@
 # Standard Library
-from enum import Enum, IntEnum
+from enum import IntEnum, StrEnum
 
 
-class GameResult(str, Enum):
+class GameResult(StrEnum):
     VICTORY = "VICTORY"
     DEFEAT = "DEFEAT"
 
 
-class GuessResult(str, Enum):
+class GuessResult(StrEnum):
     GUESSED = "GUESSED"
     NOT_GUESSED = "NOT_GUESSED"
 
 
-class GameStatus(str, Enum):
+class GameStatus(StrEnum):
     WAITING_FOR_GUESS = "WAITING_FOR_GUESS"
     FINISHED = "FINISHED"
 
 
-class GameDifficulty(str, Enum):
+class GameDifficulty(StrEnum):
     NORMAL = "NORMAL"
     HARD = "HARD"
 
