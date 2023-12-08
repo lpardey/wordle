@@ -64,3 +64,11 @@ class Game(Model):
 
         if game_status == GameStatus.FINISHED:
             return datetime.now(UTC)
+
+    @property
+    async def in_game_word(self) -> str | None:
+        game_status = await self.status
+
+        if game_status == GameStatus.FINISHED:
+            return self.game_word
+        return None
