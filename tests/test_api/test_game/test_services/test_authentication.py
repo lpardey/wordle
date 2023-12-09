@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, Mock, patch
 # Dependencies
 import pytest
 from fastapi import HTTPException, status
-from jose import JWTError, jwt
+from jose import JWTError
 
 # From apps
 from api.v1.game.services.authentication import (
@@ -25,7 +25,7 @@ from api.v1.user.models.user import User
         pytest.param(timedelta(minutes=10), id="Custom expire delta"),
     ],
 )
-@patch.object(jwt, "encode", return_value="test_encoded_token")
+@patch("api.v1.game.services.authentication.jwt.encode", return_value="test_encoded_token")
 def test_create_access_token(mock_encode: Mock, expires_delta: timedelta | None, basic_app_settings: Settings):
     test_data = {"sub": "test_username"}
     fixed_date = datetime(2023, 12, 1)
@@ -46,7 +46,7 @@ def test_create_access_token(mock_encode: Mock, expires_delta: timedelta | None,
         mock_datetime.now.call_count == 2
 
 
-@patch.object(jwt, "decode", return_value={"sub": "test_username"})
+@patch("api.v1.game.services.authentication.jwt.decode", return_value={"sub": "test_username"})
 @patch("api.v1.game.services.authentication.oauth2_scheme", return_value="123")
 def test_validate_token(mock_oauth2_scheme: Mock, mock_decode: Mock, basic_app_settings: Settings):
     token = mock_oauth2_scheme.return_value
@@ -81,7 +81,7 @@ def test_validate_token(mock_oauth2_scheme: Mock, mock_decode: Mock, basic_app_s
         ),
     ],
 )
-@patch.object(jwt, "decode")
+@patch("api.v1.game.services.authentication.jwt.decode")
 @patch("api.v1.game.services.authentication.oauth2_scheme", return_value="123")
 def test_validate_token_raise_exc(
     mock_oauth2_scheme: Mock,
@@ -107,7 +107,7 @@ def test_validate_token_raise_exc(
     mock_decode.assert_called_once_with(*mock_decode_args)
 
 
-@patch.object(User, "get_or_none")
+@patch("api.v1.game.services.authentication.User.get_or_none")
 @patch("api.v1.game.services.authentication.validate_token")
 async def test_get_current_user(mock_validate_token: AsyncMock, mock_get_or_none: AsyncMock, basic_user: User):
     mock_validate_token.return_value = basic_user.username
@@ -122,7 +122,7 @@ async def test_get_current_user(mock_validate_token: AsyncMock, mock_get_or_none
     mock_get_or_none.assert_called_once_with(username=username)
 
 
-@patch.object(User, "get_or_none", new_callable=AsyncMock, return_value=None)
+@patch("api.v1.game.services.authentication.User.get_or_none", new_callable=AsyncMock, return_value=None)
 @patch("api.v1.game.services.authentication.validate_token")
 async def test_get_current_user_user_is_not_found(
     mock_validate_token: AsyncMock, mock_get_or_none: AsyncMock, basic_user: User
