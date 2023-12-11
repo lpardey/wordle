@@ -26,24 +26,26 @@ from api.v1.user.models.user import User
     ],
 )
 @patch("api.v1.game.services.authentication.jwt.encode", return_value="test_encoded_token")
-def test_create_access_token(mock_encode: Mock, expires_delta: timedelta | None, basic_app_settings: Settings):
+@patch("api.v1.game.services.authentication.datetime")
+def test_create_access_token(
+    mock_datetime: Mock, mock_encode: Mock, expires_delta: timedelta | None, basic_app_settings: Settings
+):
     test_data = {"sub": "test_username"}
     fixed_date = datetime(2023, 12, 1)
     expires_delta = expires_delta if expires_delta else timedelta(minutes=basic_app_settings.ACCESS_TOKEN_LIFETIME)
-    with patch("api.v1.game.services.authentication.datetime") as mock_datetime:
-        mock_datetime.now.return_value = fixed_date
+    mock_datetime.now.return_value = fixed_date
 
-        encoded_token = create_access_token(test_data, expires_delta)
-        test_data.update({"exp": mock_datetime.now() + expires_delta})
+    encoded_token = create_access_token(test_data, expires_delta)
+    test_data.update({"exp": mock_datetime.now() + expires_delta})
 
-        assert encoded_token == mock_encode.return_value
-        mock_encode.assert_called_once_with(
-            test_data,
-            basic_app_settings.SECRET_KEY,
-            basic_app_settings.TOKEN_ALGORITHM,
-        )
-        mock_datetime.now.assert_called_with()
-        mock_datetime.now.call_count == 2
+    assert encoded_token == mock_encode.return_value
+    mock_encode.assert_called_once_with(
+        test_data,
+        basic_app_settings.SECRET_KEY,
+        basic_app_settings.TOKEN_ALGORITHM,
+    )
+    mock_datetime.now.assert_called_with()
+    mock_datetime.now.call_count == 2
 
 
 @patch("api.v1.game.services.authentication.jwt.decode", return_value={"sub": "test_username"})
