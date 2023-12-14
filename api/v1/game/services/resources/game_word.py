@@ -9,7 +9,6 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-STATIC_WORDS_LIST_FILE = "static/words.txt"
 STATIC_EXTRA_WORDS_LIST_FILE = "static/extra_words.txt"
 
 WordSourceFunction = Callable[[], list[str]]
@@ -39,7 +38,7 @@ def get_words_list(words_source_functions: list[WordSourceFunction]) -> list[str
     return list(all_words)
 
 
-def get_words_list_from_static_content(filename: str = STATIC_WORDS_LIST_FILE) -> list[str]:
+def get_words_list_from_static_content(filename: str = STATIC_EXTRA_WORDS_LIST_FILE) -> list[str]:
     with open(filename, "r") as f:
         words = [word.strip().upper() for word in f]
     return words

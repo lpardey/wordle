@@ -1,6 +1,3 @@
-# Standard Library
-from collections import Counter
-
 # From apps
 from api.v1.game.schemas.game import GameState
 from api.v1.game.services.resources.game_word import AllWords
