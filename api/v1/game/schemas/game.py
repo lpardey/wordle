@@ -1,7 +1,6 @@
 # Standard Library
 from datetime import datetime
 from enum import StrEnum
-from typing import TypedDict
 from uuid import UUID
 
 # Dependencies
@@ -26,7 +25,7 @@ class GameConfig(BaseModel):
     game_difficulty: GameDifficulty = GameDifficulty.NORMAL
 
 
-class GuessValue(TypedDict):
+class GuessValue(BaseModel):
     guess: str
     letters_status: list[LetterStatus]
 
