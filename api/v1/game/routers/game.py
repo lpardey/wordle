@@ -9,12 +9,11 @@ from tortoise.exceptions import BaseORMException
 
 # From apps
 from api.v1.game.models import Game, Guess
-from api.v1.game.routers.helpers.game_helpers import get_game_by_id
+from api.v1.game.routers.helpers.game_helpers import get_game_by_id, get_game_state
 from api.v1.game.schemas.game import (
     BasicStatus,
     CreateGameRequest,
     CreateGameResponse,
-    GameState,
     GameStatusResponse,
     GuessValue,
     TakeAGuessRequest,
@@ -86,13 +85,8 @@ async def take_a_guess(
     guess_request: TakeAGuessRequest,
 ) -> TakeAGuessResponse:
     game = await get_game_by_id(game_id)
-    game_state = GameState(
-        id=game_id,
-        game_word=game.game_word,
-        guess=guess_request.guess.upper(),
-        status=await game.status,
-        result=await game.result,
-    )
+    guess = guess_request.guess.upper()
+    game_state = await get_game_state(game, guess)
     wordle_game = WordleGame(game_state)
     game_status = BasicStatus.OK
     message = None
@@ -101,8 +95,8 @@ async def take_a_guess(
     try:
         guess_result = wordle_game.guess()
         letters_status = wordle_game.compare()
-        guess_data = {"guess": game_state.guess, "letters_status": letters_status}
-        await Guess.create(game_id=game_state.id, value=GuessValue(**guess_data))
+        guess_value_json = GuessValue(guess=guess, letters_status=letters_status).model_dump_json()
+        await Guess.create(game_id=game_state.id, value=guess_value_json)
         await game.save()  # To trigger the game signals
     except WordleException as e:
         game_status = BasicStatus.ERROR
