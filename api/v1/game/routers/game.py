@@ -75,7 +75,7 @@ async def get_game_status(
         guesses=await game.guesses.all().values_list("value", flat=True),
         result=await game.result,
         status=await game.status,
-        finished_date=await game.finished_date,
+        finished_date=game.finished_date,
     )
 
 
@@ -103,6 +103,7 @@ async def take_a_guess(
         letters_status = wordle_game.compare()
         guess_data = {"guess": game_state.guess, "letters_status": letters_status}
         await Guess.create(game_id=game_state.id, value=GuessValue(**guess_data))
+        await game.save()  # To trigger the game signals
     except WordleException as e:
         game_status = BasicStatus.ERROR
         message = str(e)
