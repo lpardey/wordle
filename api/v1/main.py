@@ -5,6 +5,7 @@ from tortoise.contrib.fastapi import register_tortoise
 
 # From apps
 from api.v1.game.routers.game import router as game_router
+from api.v1.game.signals.game import update_game_finished_date  # To register the signal handler
 from api.v1.user.routers.user import router as user_router
 
 # Local imports
