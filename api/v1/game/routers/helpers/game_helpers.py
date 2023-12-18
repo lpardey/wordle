@@ -1,5 +1,5 @@
 # Standard Library
-from asyncio import gather
+import asyncio
 from uuid import UUID
 
 # Dependencies
@@ -26,5 +26,5 @@ async def get_game_by_id(game_id: UUID) -> Game:
 
 
 async def get_game_state(game: Game, guess: str) -> GameState:
-    status, result = await gather(game.status, game.result)
+    status, result = await asyncio.gather(game.status, game.result)
     return GameState(id=game.id, game_word=game.game_word, guess=guess, status=status, result=result)
