@@ -1,4 +1,5 @@
 # Standard Library
+import asyncio
 from uuid import UUID
 
 # Dependencies
@@ -8,6 +9,7 @@ from tortoise.exceptions import BaseORMException
 
 # From apps
 from api.v1.game.models.game import Game
+from api.v1.game.schemas.game import GameState
 
 
 async def get_game_by_id(game_id: UUID) -> Game:
@@ -21,3 +23,8 @@ async def get_game_by_id(game_id: UUID) -> Game:
         raise HTTPException(status.HTTP_404_NOT_FOUND, detail="Game not found")
 
     return game
+
+
+async def get_game_state(game: Game, guess: str) -> GameState:
+    status, result = await asyncio.gather(game.status, game.result)
+    return GameState(id=game.id, game_word=game.game_word, guess=guess, status=status, result=result)

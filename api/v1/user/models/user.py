@@ -5,10 +5,6 @@ from typing import TYPE_CHECKING
 from tortoise import fields
 from tortoise.models import Model
 
-# From apps
-# from api.v1.game.models import Game
-from api.v1.game.services.resources.schemas import GameStatus
-
 if TYPE_CHECKING:
     # From apps
     from api.v1.game.models import Game

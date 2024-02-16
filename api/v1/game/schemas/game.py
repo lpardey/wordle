@@ -1,7 +1,6 @@
 # Standard Library
 from datetime import datetime
-from enum import Enum
-from typing import TypedDict
+from enum import StrEnum
 from uuid import UUID
 
 # Dependencies
@@ -11,7 +10,7 @@ from pydantic import BaseModel
 from api.v1.game.services.resources.schemas import GameDifficulty, GameResult, GameStatus, GuessResult, LetterStatus
 
 
-class BasicStatus(str, Enum):
+class BasicStatus(StrEnum):
     OK = "OK"
     ERROR = "ERROR"
 
@@ -26,15 +25,16 @@ class GameConfig(BaseModel):
     game_difficulty: GameDifficulty = GameDifficulty.NORMAL
 
 
-class GuessValue(TypedDict):
+class GuessValue(BaseModel):
     guess: str
     letters_status: list[LetterStatus]
 
 
 class GameStatusResponse(BaseModel):
     id: UUID
-    _game_word: str
+    game_word: str | None
     guesses_left: int
+    max_attempts: int
     difficulty: GameDifficulty
     creation_date: datetime
     guesses: list[GuessValue]

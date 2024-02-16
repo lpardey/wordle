@@ -7,7 +7,7 @@ from api.v1.settings import get_settings
 SETTINGS = get_settings()
 
 
-async def purge_db():
+async def purge_db() -> None:
     await Tortoise.init(
         db_url=SETTINGS.DATABASE_URL,
         modules={"models": SETTINGS.DATABASE_MODELS},

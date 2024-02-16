@@ -1,5 +1,4 @@
 # Standard Library
-from datetime import datetime
 from typing import TYPE_CHECKING
 
 # Dependencies
@@ -24,6 +23,7 @@ class Game(Model):
     max_attempts = fields.SmallIntField()
     difficulty = fields.CharEnumField(enum_type=GameDifficulty)
     creation_date = fields.DatetimeField(auto_now_add=True)
+    finished_date = fields.DatetimeField(null=True, default=None)
     guesses: fields.ReverseRelation["Guess"]
 
     def __str__(self) -> str:
@@ -59,8 +59,8 @@ class Game(Model):
         return GameStatus.FINISHED
 
     @property
-    async def finished_date(self) -> datetime | None:
+    async def in_game_word(self) -> str | None:
         game_status = await self.status
 
         if game_status == GameStatus.FINISHED:
-            return datetime.utcnow()
+            return self.game_word

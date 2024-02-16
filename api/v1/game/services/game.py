@@ -1,6 +1,3 @@
-# Standard Library
-from collections import Counter
-
 # From apps
 from api.v1.game.schemas.game import GameState
 from api.v1.game.services.resources.game_word import AllWords
@@ -45,22 +42,26 @@ class WordleGame:
         return GuessResult.NOT_GUESSED
 
     def compare(self) -> list[LetterStatus]:
-        """
-        This function assumes word and guess are the same length.
-        """
-
-        def _compare_letters(guess_letter: str, word_letter: str) -> LetterStatus:
-            if guess_letter == word_letter:
-                return LetterStatus.IN_PLACE
-            if guess_letter in letter_count and letter_count[guess_letter] > 0:
-                letter_count[guess_letter] -= 1
-                return LetterStatus.PRESENT
-            return LetterStatus.NOT_PRESENT
-
         guess = self.game_state.guess
         word = self.game_state.game_word
-        letter_count = Counter(word)
-        guess_letters_status = [
-            _compare_letters(guess_letter, word_letter) for guess_letter, word_letter in zip(guess, word)
-        ]
-        return guess_letters_status
+        result = [None] * len(guess)
+        remaining_letters = {letter: word.count(letter) for letter in word}
+
+        # First evaluation: marks letters in place and not present
+        for i in range(len(guess)):
+            if guess[i] == word[i]:
+                result[i] = LetterStatus.IN_PLACE
+                remaining_letters[guess[i]] -= 1
+            elif guess[i] not in remaining_letters:
+                result[i] = LetterStatus.NOT_PRESENT
+
+        # Second evaluation: marks letters present
+        for i in range(len(guess)):
+            if result[i] == None:
+                if remaining_letters[guess[i]] > 0:
+                    result[i] = LetterStatus.PRESENT
+                    remaining_letters[guess[i]] -= 1
+                else:
+                    result[i] = LetterStatus.NOT_PRESENT
+
+        return result
